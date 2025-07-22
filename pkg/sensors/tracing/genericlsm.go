@@ -102,16 +102,11 @@ func (k *observerLsmSensor) LoadProbe(args sensors.LoadProbeArgs) error {
 			},
 		}
 		args.Load.MapLoad = append(args.Load.MapLoad, config)
-
-		if err := program.LoadLSMProgram(args.BPFDir, args.Load, args.Maps, args.Verbose); err == nil {
-			logger.GetLogger().Info(fmt.Sprintf("Loaded generic LSM program: %s -> %s", args.Load.Name, args.Load.Attach))
-		} else {
-			return err
-		}
-	} else {
-		return fmt.Errorf("invalid loadData type: expecting idtable.EntryID/[] and got: %T (%v)",
-			args.Load.LoaderData, args.Load.LoaderData)
 	}
+	if err := program.LoadLSMProgram(args.BPFDir, args.Load, args.Maps, args.Verbose); err != nil {
+		return err
+	}
+	logger.GetLogger().Info(fmt.Sprintf("Loaded generic LSM program: %s -> %s", args.Load.Name, args.Load.Attach))
 	return nil
 }
 
@@ -464,7 +459,6 @@ func createLsmSensorFromEntry(polInfo *policyInfo, lsmEntry *genericLsm,
 		"lsm/generic_lsm_output",
 		lsmEntry.hook,
 		"generic_lsm").
-		SetLoaderData(lsmEntry.tableId).
 		SetPolicy(lsmEntry.policyName)
 	progs = append(progs, loadOutput)
 
@@ -488,7 +482,6 @@ func createLsmSensorFromEntry(polInfo *policyInfo, lsmEntry *genericLsm,
 				"lsm.s/generic_lsm_ima_"+loadProgImaType,
 				lsmEntry.hook,
 				"generic_lsm").
-				SetLoaderData(lsmEntry.tableId).
 				SetPolicy(lsmEntry.policyName)
 			progs = append(progs, loadIma)
 			imaHashMap := program.MapBuilderProgram("ima_hash_map", loadIma)
