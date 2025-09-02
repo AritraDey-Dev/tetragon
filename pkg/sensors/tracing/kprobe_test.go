@@ -87,6 +87,7 @@ var (
 )
 
 func TestKprobeObjectLoad(t *testing.T) {
+	t.Fatal("Forcing test to fail for CI check")
 	writeReadHook := `
 apiVersion: cilium.io/v1alpha1
 kind: TracingPolicy
