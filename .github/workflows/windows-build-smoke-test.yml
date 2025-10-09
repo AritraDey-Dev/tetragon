@@ -6,7 +6,6 @@ on:
   push:
     branches:
       - main
-      - test  
       - v*
     paths-ignore:
       - docs/**
@@ -172,9 +171,9 @@ jobs:
       - windows-ebpf-prog-build
     timeout-minutes: 15
     strategy:
-      fail-fast: false # Ensure all 20 jobs run even if one fails
       matrix:
-        run_number: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+        version:
+          - main
     env:
       TEMP: D:\temp
       
