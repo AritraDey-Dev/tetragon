@@ -27,7 +27,7 @@ const (
 )
 
 const (
-	defaultServerAddress = ""
+	defaultServerAddress = "localhost:54321"
 )
 
 var (
