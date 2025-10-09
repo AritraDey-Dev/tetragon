@@ -6,7 +6,7 @@ on:
   push:
     branches:
       - main
-      - test  
+      - test-new
       - v*
     paths-ignore:
       - docs/**
