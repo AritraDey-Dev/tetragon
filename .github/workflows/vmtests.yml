@@ -5,7 +5,7 @@ on:
       - 'docs/**'
   push:
     branches:
-      - main
+      - '*'
     paths-ignore:
       - 'docs/**'
 
@@ -65,38 +65,66 @@ jobs:
     strategy:
         fail-fast: false
         matrix:
-           kernel:
-              # renovate: datasource=docker depName=quay.io/lvh-images/kernel-images
-              - 'rhel8.9-20240806.173325'
-              # renovate: datasource=docker depName=quay.io/lvh-images/kernel-images
-              - 'bpf-next-20251008.075427'
-              # renovate: datasource=docker depName=quay.io/lvh-images/kernel-images
-              - '6.6-20251008.075427'
-              # renovate: datasource=docker depName=quay.io/lvh-images/kernel-images
-              - '6.1-20251008.075427'
-              # renovate: datasource=docker depName=quay.io/lvh-images/kernel-images
-              - '5.15-20251008.075427'
-              # renovate: datasource=docker depName=quay.io/lvh-images/kernel-images
-              - '5.10-20251008.075427'
-              # renovate: datasource=docker depName=quay.io/lvh-images/kernel-images
-              - '5.4-20251008.075427'
-              # renovate: datasource=docker depName=quay.io/lvh-images/kernel-images
-              - '4.19-20251008.075427'
-           group:
-              - 0
+           include:
+              # AMD64 tests
+              - arch: amd64
+                runner: ubuntu-latest
+                kernel: 'rhel8.9-20240806.173325'
+                group: 0
+              - arch: amd64
+                runner: ubuntu-latest
+                kernel: 'bpf-next-20251008.075427'
+                group: 0
+              - arch: amd64
+                runner: ubuntu-latest
+                kernel: '6.6-20251008.075427'
+                group: 0
+              - arch: amd64
+                runner: ubuntu-latest
+                kernel: '6.1-20251008.075427'
+                group: 0
+              - arch: amd64
+                runner: ubuntu-latest
+                kernel: '5.15-20251008.075427'
+                group: 0
+              - arch: amd64
+                runner: ubuntu-latest
+                kernel: '5.10-20251008.075427'
+                group: 0
+              - arch: amd64
+                runner: ubuntu-latest
+                kernel: '5.4-20251008.075427'
+                group: 0
+              - arch: amd64
+                runner: ubuntu-latest
+                kernel: '4.19-20251008.075427'
+                group: 0
+              # ARM64 tests (limited kernel set for now)
+              - arch: arm64
+                runner: ubuntu-latest
+                kernel: '6.6-20251008.075427'
+                group: 0
+              - arch: arm64
+                runner: ubuntu-latest
+                kernel: '5.15-20251008.075427'
+                group: 0
     concurrency:
-      group: ${{ github.ref }}-vmtest-${{ matrix.kernel }}-${{ matrix.group }}
+      group: ${{ github.ref }}-vmtest-${{ matrix.arch }}-${{ matrix.kernel }}-${{ matrix.group }}
       cancel-in-progress: true
     needs: build
-    name: Test kernel ${{ matrix.kernel }} / test group ${{ matrix.group }}
-    runs-on: ubuntu-latest
+    name: Test ${{ matrix.arch }} kernel ${{ matrix.kernel }} / test group ${{ matrix.group }}
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
     steps:
     - name: Install VM test dependencies
       run: |
         sudo apt-get update
         sudo apt-cache search qemu
-        sudo apt-get install -y mmdebstrap libguestfs-tools qemu-utils qemu-system-x86 cpu-checker qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virtinst virt-manager isc-dhcp-client
+        if [ "${{ matrix.arch }}" = "amd64" ]; then
+          sudo apt-get install -y mmdebstrap libguestfs-tools qemu-utils qemu-system-x86 cpu-checker qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virtinst virt-manager isc-dhcp-client
+        else
+          sudo apt-get install -y mmdebstrap libguestfs-tools qemu-utils qemu-system-aarch64 qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virtinst virt-manager isc-dhcp-client
+        fi
 
     - name: Make kernel accessible
       run: |
@@ -117,22 +145,23 @@ jobs:
       if: ${{ !startsWith(matrix.kernel, '4.19') }}
       run: |
         cd go/src/github.com/cilium/tetragon
-        ./tests/vmtests/fetch-data.sh ${{ matrix.kernel }}
-        kimage=$(find tests/vmtests/test-data/kernels -path "*vmlinuz*" -type f)
+        ARCH=${{ matrix.arch }} ./tests/vmtests/fetch-data.sh ${{ matrix.kernel }}
+        kimage=$(find tests/vmtests/test-data/kernels -path "*vmlinuz*" -o -path "*Image*" -type f)
         echo "Using: kernel:$kimage"
         sudo ./tests/vmtests/tetragon-vmtests-run \
                 --kernel ${kimage} \
                 --kernel-ver  ${{ matrix.kernel }} \
                 --base tests/vmtests/test-data/images/base.qcow2 \
                 --enable-detailed-results \
-                --testsfile ./tests/vmtests/test-group-${{ matrix.group }}
+                --testsfile ./tests/vmtests/test-group-${{ matrix.group }} \
+                --qemu-arch ${{ matrix.arch }}
 
     - name: test kernel ${{ matrix.kernel }} with btf file
       if: ${{ startsWith(matrix.kernel, '4.19') }}
       run: |
         cd go/src/github.com/cilium/tetragon
-        ./tests/vmtests/fetch-data.sh ${{ matrix.kernel }}
-        kimage=$(find tests/vmtests/test-data/kernels -path "*vmlinuz*" -type f)
+        ARCH=${{ matrix.arch }} ./tests/vmtests/fetch-data.sh ${{ matrix.kernel }}
+        kimage=$(find tests/vmtests/test-data/kernels -path "*vmlinuz*" -o -path "*Image*" -type f)
         btf=$(find tests/vmtests/test-data/kernels -path "*btf*" -type f)
         echo "Using: kernel:$kimage bptf:$btf"
         sudo ./tests/vmtests/tetragon-vmtests-run \
@@ -141,7 +170,8 @@ jobs:
                 --btf-file ${btf} \
                 --base tests/vmtests/test-data/images/base.qcow2 \
                 --enable-detailed-results \
-                --testsfile ./tests/vmtests/test-group-${{ matrix.group }}
+                --testsfile ./tests/vmtests/test-group-${{ matrix.group }} \
+                --qemu-arch ${{ matrix.arch }}
 
     - name: Chmod test results on failure or cancelation
       if: failure() || cancelled()
@@ -152,7 +182,7 @@ jobs:
       if: failure() || cancelled()
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       with:
-        name: tetragon-vmtests-${{ matrix.kernel }}-${{ matrix.group }}-results
+        name: tetragon-vmtests-${{ matrix.arch }}-${{ matrix.kernel }}-${{ matrix.group }}-results
         path: go/src/github.com/cilium/tetragon/tests/vmtests/vmtests-results-*
         retention-days: 5
 

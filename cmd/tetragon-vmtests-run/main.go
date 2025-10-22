@@ -84,7 +84,12 @@ func main() {
 				return err
 			}
 
-			runtimeArch, err := arch.NewArch(runtime.GOARCH)
+			// Use specified architecture or fall back to runtime.GOARCH
+			archStr := rcnf.QemuArch
+			if archStr == "" {
+				archStr = runtime.GOARCH
+			}
+			runtimeArch, err := arch.NewArch(archStr)
 			if err != nil {
 				return fmt.Errorf("failed to create lvh arch: %w", err)
 			}
@@ -166,6 +171,7 @@ func main() {
 	cmd.Flags().StringVar(&rcnf.testerConf.KernelVer, "kernel-ver", "", "kenel version")
 	cmd.Flags().BoolVar(&rcnf.detailedResults, "enable-detailed-results", false, "produce detailed results")
 	cmd.Flags().StringVar(&rcnf.RootDev, "root-dev", "vda", "type of root device (hda or vda)")
+	cmd.Flags().StringVar(&rcnf.QemuArch, "qemu-arch", "", "QEMU architecture to use (amd64 or arm64). If not specified, uses runtime.GOARCH")
 
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
