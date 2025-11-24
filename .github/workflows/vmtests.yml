@@ -5,7 +5,8 @@ on:
       - 'docs/**'
   push:
     branches:
-      - main
+    #for all branches
+      - ['*']
     paths-ignore:
       - 'docs/**'
 
