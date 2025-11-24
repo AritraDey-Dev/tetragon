@@ -7,6 +7,7 @@ package progs
 
 import (
 	"context"
+	"strings"
 	"testing"
 	"time"
 
@@ -43,7 +44,9 @@ func TestSigkill(t *testing.T) {
 	pt := StartTester(t, ctx)
 	out, err := pt.ExecMayFail(raisesigkillProg)
 	require.NoError(t, err)
-	require.Contains(t, out, "signal: killed")
+	if !strings.Contains(out, "signal: killed") && !strings.Contains(out, "exit status 137") {
+		t.Fatalf("output %q does not contain \"signal: killed\" or \"exit status 137\"", out)
+	}
 	err = pt.Stop()
 	require.NoError(t, err)
 }
