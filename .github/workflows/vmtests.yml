@@ -5,7 +5,7 @@ on:
       - 'docs/**'
   push:
     branches:
-      - main
+      - 'feature/*'
     paths-ignore:
       - 'docs/**'
 
@@ -65,6 +65,8 @@ jobs:
     strategy:
         fail-fast: false
         matrix:
+           cgroup_mode:
+              - 'v2'
            kernel:
               # renovate: datasource=docker depName=quay.io/lvh-images/kernel-images
               - 'rhel8.9-20240806.173325'
@@ -86,11 +88,15 @@ jobs:
               - '4.19-20251113.115124'
            group:
               - 0
+           include:
+              - kernel: '4.19-20251113.115124'
+                group: 0
+                cgroup_mode: 'v1-v2'
     concurrency:
-      group: ${{ github.ref }}-vmtest-${{ matrix.kernel }}-${{ matrix.group }}
+      group: ${{ github.ref }}-vmtest-${{ matrix.kernel }}-${{ matrix.group }}-${{ matrix.cgroup_mode }}
       cancel-in-progress: true
     needs: build
-    name: Test kernel ${{ matrix.kernel }} / test group ${{ matrix.group }}
+    name: Test kernel ${{ matrix.kernel }} / test group ${{ matrix.group }} / cgroup ${{ matrix.cgroup_mode }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -122,11 +128,16 @@ jobs:
         ./tests/vmtests/fetch-data.sh ${{ matrix.kernel }}
         kimage=$(find tests/vmtests/test-data/kernels -path "*vmlinuz*" -type f)
         echo "Using: kernel:$kimage"
+        CGROUP_ARGS=""
+        if [ "${{ matrix.cgroup_mode }}" = "v1-v2" ]; then
+           CGROUP_ARGS="--disable-unified-cgroups"
+        fi
         sudo ./tests/vmtests/tetragon-vmtests-run \
                 --kernel ${kimage} \
                 --kernel-ver  ${{ matrix.kernel }} \
                 --base tests/vmtests/test-data/images/base.qcow2 \
                 --enable-detailed-results \
+                ${CGROUP_ARGS} \
                 --testsfile ./tests/vmtests/test-group-${{ matrix.group }}
 
     - name: test kernel ${{ matrix.kernel }} with btf file
@@ -137,12 +148,17 @@ jobs:
         kimage=$(find tests/vmtests/test-data/kernels -path "*vmlinuz*" -type f)
         btf=$(find tests/vmtests/test-data/kernels -path "*btf*" -type f)
         echo "Using: kernel:$kimage bptf:$btf"
+        CGROUP_ARGS=""
+        if [ "${{ matrix.cgroup_mode }}" = "v1-v2" ]; then
+           CGROUP_ARGS="--disable-unified-cgroups"
+        fi
         sudo ./tests/vmtests/tetragon-vmtests-run \
                 --kernel ${kimage} \
                 --kernel-ver  ${{ matrix.kernel }} \
                 --btf-file ${btf} \
                 --base tests/vmtests/test-data/images/base.qcow2 \
                 --enable-detailed-results \
+                ${CGROUP_ARGS} \
                 --testsfile ./tests/vmtests/test-group-${{ matrix.group }}
 
     - name: Chmod test results on failure or cancelation
