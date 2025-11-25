@@ -161,7 +161,7 @@ func main() {
 	cmd.Flags().StringVar(&rcnf.btfFile, "btf-file", "", "BTF file to use.")
 	cmd.Flags().BoolVar(&rcnf.testerConf.FailFast, "fail-fast", false, "Exit as soon as an error is encountered.")
 	cmd.Flags().BoolVar(&rcnf.keepAllLogs, "keep-all-logs", false, "Normally, logs are kept only for failed tests. This switch keeps all logs.")
-	cmd.Flags().BoolVar(&rcnf.disableUnifiedCgroups, "disable-unified-cgroups", false, "boot with systemd.unified_cgroup_hierarchy=0.")
+	cmd.Flags().BoolVar(&rcnf.disableUnifiedCgroups, "disable-unified-cgroups", false, "boot with systemd.unified_cgroup_hierarchy=0 and SYSTEMD_CGROUP_ENABLE_LEGACY_FORCE=1 (for cgroup v1+v2 hybrid mode).")
 	cmd.Flags().StringArrayVarP(&ports, "port", "p", nil, "Forward a port (hostport[:vmport[:tcp|udp]])")
 	cmd.Flags().StringVar(&rcnf.testerConf.KernelVer, "kernel-ver", "", "kenel version")
 	cmd.Flags().BoolVar(&rcnf.detailedResults, "enable-detailed-results", false, "produce detailed results")

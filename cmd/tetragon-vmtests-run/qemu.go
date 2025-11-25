@@ -18,6 +18,8 @@ func buildQemuArgs(log *logrus.Logger, rcnf RunConf) ([]string, error) {
 	if rcnf.KernelFname != "" {
 		if rcnf.disableUnifiedCgroups {
 			rcnf.KernelAppendArgs = append(rcnf.KernelAppendArgs, "systemd.unified_cgroup_hierarchy=0")
+			// For systemd 256+, we need to force-enable legacy cgroup support
+			rcnf.KernelAppendArgs = append(rcnf.KernelAppendArgs, "SYSTEMD_CGROUP_ENABLE_LEGACY_FORCE=1")
 		}
 		if rcnf.useTetragonTesterInit {
 			rcnf.KernelAppendArgs = append(rcnf.KernelAppendArgs, "init="+TetragonTesterBin)
