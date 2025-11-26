@@ -1047,6 +1047,8 @@ func TestCgroupv2K8sHierarchyInHybrid(t *testing.T) {
 	option.Config.Verbosity = 5
 
 	tus.LoadInitialSensor(t)
+	tus.LoadSensor(t, testsensor.GetTestSensor())
+	tus.LoadSensor(t, testsensor.GetCgroupSensor())
 
 	// Probe full environment detection
 	setupTgRuntimeConf(t, invalidValue, invalidValue, invalidValue, invalidValue)
