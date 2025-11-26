@@ -172,7 +172,7 @@ jobs:
       with:
         name: tetragon-vmtests-${{ matrix.kernel }}-${{ matrix.group }}-results
         path: go/src/github.com/cilium/tetragon/tests/vmtests/vmtests-results-*
-        retention-days: 5
+        retention-days: 2
 
   post-test:
     runs-on: ubuntu-latest
