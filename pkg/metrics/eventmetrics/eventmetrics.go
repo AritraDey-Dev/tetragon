@@ -58,7 +58,7 @@ var (
 	MissedEvents = metrics.MustNewCustomCounter(metrics.NewOpts(
 		consts.MetricsNamespace, "bpf", "missed_events_total",
 		"Number of Tetragon perf events that are failed to be sent from the kernel.",
-		nil, []metrics.ConstrainedLabel{metrics.OpCodeLabel, perfEventErrorLabel}, nil,
+		nil, []metrics.ConstrainedLabel{metrics.OpCodeLabelWithUndef, perfEventErrorLabel}, nil,
 	))
 	FlagCount = metrics.MustNewCounter(
 		metrics.NewOpts(

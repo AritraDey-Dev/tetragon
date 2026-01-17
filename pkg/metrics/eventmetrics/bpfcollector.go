@@ -57,7 +57,7 @@ func collect(ch chan<- prometheus.Metric) {
 }
 
 func collectForDocs(ch chan<- prometheus.Metric) {
-	for _, opcode := range metrics.OpCodeLabel.Values {
+	for _, opcode := range metrics.OpCodeLabelWithUndef.Values {
 		for _, er := range perfEventErrorLabel.Values {
 			ch <- MissedEvents.MustMetric(0, opcode, er)
 		}

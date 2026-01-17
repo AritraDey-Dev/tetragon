@@ -28,7 +28,7 @@ Number of Tetragon perf events that are failed to be sent from the kernel.
 | label | values |
 | ----- | ------ |
 | `error` | `E2BIG, EAGAIN, EBUSY, EINVAL, ENOENT, ENOSPC, unknown` |
-| `msg_op` | `13, 14, 15, 16, 23, 24, 25, 26, 27, 5, 7` |
+| `opcode` | `0, 13, 14, 15, 16, 23, 24, 25, 26, 27, 5, 7` |
 
 ### `tetragon_build_info`
 
@@ -216,7 +216,7 @@ The latency of handling messages in us.
 
 | label | values |
 | ----- | ------ |
-| `op   ` | `13, 14, 15, 16, 23, 24, 25, 26, 27, 5, 7` |
+| `opcode` | `13, 14, 15, 16, 23, 24, 25, 26, 27, 5, 7` |
 
 ### `tetragon_map_capacity`
 
@@ -274,7 +274,7 @@ The total number of times we encounter a given message opcode. For internal use 
 
 | label | values |
 | ----- | ------ |
-| `msg_op` | `13, 14, 15, 16, 23, 24, 25, 26, 27, 5, 7` |
+| `opcode` | `13, 14, 15, 16, 23, 24, 25, 26, 27, 5, 7` |
 
 ### `tetragon_notify_overflowed_events_total`
 

@@ -52,16 +52,19 @@ func promContainsLabel(labels prometheus.ConstrainedLabels, label string) bool {
 }
 
 var (
-	// TODO: Standardize labels used by different metrics: op, msg_op, opcode.
-	// Also, add a human-readable counterpart.
+	// TODO: Add a human-readable counterpart.
 	OpCodeLabel = ConstrainedLabel{
-		Name: "msg_op",
+		Name: "opcode",
 		// These are numbers, not human-readable names.
 		Values: getOpcodes(),
 	}
 	EventTypeLabel = ConstrainedLabel{
 		Name:   "event_type",
 		Values: getEventTypes(),
+	}
+	OpCodeLabelWithUndef = ConstrainedLabel{
+		Name:   "opcode",
+		Values: getOpcodesWithUndef(),
 	}
 )
 
@@ -70,6 +73,18 @@ func getOpcodes() []string {
 	i := 0
 	for opcode := range ops.OpCodeStrings {
 		if opcode != ops.MSG_OP_UNDEF && opcode != ops.MSG_OP_TEST {
+			result[i] = strconv.Itoa(int(int32(opcode)))
+			i++
+		}
+	}
+	return result
+}
+
+func getOpcodesWithUndef() []string {
+	result := make([]string, len(ops.OpCodeStrings)-1)
+	i := 0
+	for opcode := range ops.OpCodeStrings {
+		if opcode != ops.MSG_OP_TEST {
 			result[i] = strconv.Itoa(int(int32(opcode)))
 			i++
 		}
