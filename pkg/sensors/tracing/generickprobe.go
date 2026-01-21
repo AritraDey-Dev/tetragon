@@ -22,7 +22,6 @@ import (
 	ciliumbtf "github.com/cilium/ebpf/btf"
 	lru "github.com/hashicorp/golang-lru/v2"
 
-	"github.com/cilium/tetragon/pkg/api/ops"
 	"github.com/cilium/tetragon/pkg/api/processapi"
 	api "github.com/cilium/tetragon/pkg/api/tracingapi"
 	"github.com/cilium/tetragon/pkg/arch"
@@ -53,14 +52,6 @@ import (
 
 type observerKprobeSensor struct {
 	name string
-}
-
-func init() {
-	kprobe := &observerKprobeSensor{
-		name: "kprobe sensor",
-	}
-	sensors.RegisterProbeType("generic_kprobe", kprobe)
-	observer.RegisterEventHandlerAtInit(ops.MSG_OP_GENERIC_KPROBE, handleGenericKprobe)
 }
 
 type kprobeSelectors struct {
@@ -150,6 +141,10 @@ var (
 	// genericKprobeTable is a global table that maintains information for generic kprobes
 	genericKprobeTable idtable.Table
 )
+
+func GenericKprobeTableGet(id idtable.EntryID) (*genericKprobe, error) {
+	return genericKprobeTableGet(id)
+}
 
 func genericKprobeTableGet(id idtable.EntryID) (*genericKprobe, error) {
 	entry, err := genericKprobeTable.GetEntry(id)
@@ -1283,6 +1278,10 @@ func loadMultiKprobeSensor(ids []idtable.EntryID, bpfDir string, load *program.P
 	return nil
 }
 
+func LoadGenericKprobeSensor(bpfDir string, load *program.Program, maps []*program.Map, verbose int) error {
+	return loadGenericKprobeSensor(bpfDir, load, maps, verbose)
+}
+
 func loadGenericKprobeSensor(bpfDir string, load *program.Program, maps []*program.Map, verbose int) error {
 	if id, ok := load.LoaderData.(idtable.EntryID); ok {
 		return loadSingleKprobeSensor(id, bpfDir, load, maps, verbose)
@@ -1309,6 +1308,10 @@ func dnsLookup(fqdn string) {
 		},
 	}
 	res.LookupIP(context.Background(), "ip4", fqdn)
+}
+
+func HandleGenericKprobe(r *bytes.Reader) ([]observer.Event, error) {
+	return handleGenericKprobe(r)
 }
 
 func handleGenericKprobe(r *bytes.Reader) ([]observer.Event, error) {
