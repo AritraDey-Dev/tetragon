@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright Authors of Tetragon
 
-package tracing
+//go:build !windows
+
+package common
 
 import (
 	"strings"
@@ -11,19 +13,19 @@ import (
 )
 
 func TestGetPolicyMessage(t *testing.T) {
-	msg, err := getPolicyMessage("")
+	msg, err := GetPolicyMessage("")
 	require.Empty(t, msg)
 	require.Equal(t, err, ErrMsgSyntaxEmpty)
 
-	msg, err = getPolicyMessage("a")
+	msg, err = GetPolicyMessage("a")
 	require.Empty(t, msg)
 	require.Equal(t, err, ErrMsgSyntaxShort)
 
-	msg, err = getPolicyMessage("test")
+	msg, err = GetPolicyMessage("test")
 	require.NoError(t, err)
 	require.Equal(t, "test", msg)
 
-	msg, err = getPolicyMessage(strings.Repeat("a", TpMaxMessageLen+1))
+	msg, err = GetPolicyMessage(strings.Repeat("a", TpMaxMessageLen+1))
 	require.Equal(t, err, ErrMsgSyntaxLong)
 	require.Len(t, msg, TpMaxMessageLen)
 }
