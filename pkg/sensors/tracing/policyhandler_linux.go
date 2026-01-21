@@ -7,17 +7,13 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/cilium/ebpf"
-
 	"github.com/cilium/tetragon/pkg/eventhandler"
 	"github.com/cilium/tetragon/pkg/k8s/apis/cilium.io/v1alpha1"
 	"github.com/cilium/tetragon/pkg/logger"
-	"github.com/cilium/tetragon/pkg/policyconf"
 	"github.com/cilium/tetragon/pkg/policyfilter"
-	"github.com/cilium/tetragon/pkg/policystats"
-	"github.com/cilium/tetragon/pkg/selectors"
 	"github.com/cilium/tetragon/pkg/sensors"
 	"github.com/cilium/tetragon/pkg/sensors/program"
+	"github.com/cilium/tetragon/pkg/sensors/tracing/common"
 	"github.com/cilium/tetragon/pkg/tracingpolicy"
 )
 
@@ -35,53 +31,15 @@ func newPolicyInfo(
 	policy tracingpolicy.TracingPolicy,
 	policyID policyfilter.PolicyID,
 ) (*policyInfo, error) {
-	namespace := ""
-	if tpn, ok := policy.(tracingpolicy.TracingPolicyNamespaced); ok {
-		namespace = tpn.TpNamespace()
+	commonInfo, err := common.NewPolicyInfo(policy, policyID)
+	if err != nil {
+		return nil, err
 	}
-
-	return newPolicyInfoFromSpec(
-		namespace,
-		policy.TpName(),
-		policyID,
-		policy.TpSpec(),
-		eventhandler.GetCustomEventhandler(policy),
-	)
-
+	return convertPolicyInfo(commonInfo)
 }
 
 func hasEnforcementActions(spec *v1alpha1.TracingPolicySpec) bool {
-	for _, kprobe := range spec.KProbes {
-		if selectors.HasEnforcementAction(kprobe.Selectors) || selectors.HasOverride(kprobe.Selectors) {
-			return true
-		}
-	}
-
-	for _, uprobe := range spec.UProbes {
-		if selectors.HasEnforcementAction(uprobe.Selectors) || selectors.HasOverride(uprobe.Selectors) {
-			return true
-		}
-	}
-
-	for _, tp := range spec.Tracepoints {
-		if selectors.HasEnforcementAction(tp.Selectors) || selectors.HasOverride(tp.Selectors) {
-			return true
-		}
-	}
-
-	for _, lsm := range spec.LsmHooks {
-		if selectors.HasEnforcementAction(lsm.Selectors) || selectors.HasOverride(lsm.Selectors) {
-			return true
-		}
-	}
-
-	for _, usdt := range spec.Usdts {
-		if selectors.HasEnforcementAction(usdt.Selectors) || selectors.HasOverride(usdt.Selectors) {
-			return true
-		}
-	}
-
-	return false
+	return common.HasEnforcementActions(spec)
 }
 
 func newPolicyInfoFromSpec(
@@ -90,55 +48,67 @@ func newPolicyInfoFromSpec(
 	spec *v1alpha1.TracingPolicySpec,
 	customHandler eventhandler.Handler,
 ) (*policyInfo, error) {
-	opts, err := getSpecOptions(spec.Options)
+	commonInfo, err := common.NewPolicyInfoFromSpec(namespace, name, policyID, spec, customHandler)
 	if err != nil {
 		return nil, err
 	}
+	return convertPolicyInfo(commonInfo)
+}
 
-	// If enforcement is not allowed, force monitor only
-	if !hasEnforcementActions(spec) {
-		opts.policyMode = policyconf.MonitorOnlyMode
+func convertPolicyInfo(commonInfo *common.PolicyInfo) (*policyInfo, error) {
+	// Convert common.SpecOptions to local specOptions
+	var localOpts *specOptions
+	if commonInfo.SpecOpts != nil {
+		localOpts = &specOptions{SpecOptions: commonInfo.SpecOpts}
 	}
 
 	return &policyInfo{
-		name:          name,
-		namespace:     namespace,
-		policyID:      policyID,
-		customHandler: customHandler,
-		policyConf:    nil,
-		policyStats:   nil,
-		specOpts:      opts,
+		name:          commonInfo.Name,
+		namespace:     commonInfo.Namespace,
+		policyID:      commonInfo.PolicyID,
+		customHandler: commonInfo.CustomHandler,
+		policyConf:    commonInfo.PolicyConf,
+		policyStats:   commonInfo.PolicyStats,
+		specOpts:      localOpts,
 	}, nil
 }
 
 func (pi *policyInfo) policyStatsMap(prog *program.Program) *program.Map {
-	if pi.policyStats != nil {
-		return program.MapUserFrom(pi.policyStats)
+	// Convert to common.PolicyInfo temporarily to use common method
+	commonInfo := &common.PolicyInfo{
+		Name:          pi.name,
+		Namespace:     pi.namespace,
+		PolicyID:      pi.policyID,
+		CustomHandler: pi.customHandler,
+		PolicyConf:    pi.policyConf,
+		PolicyStats:   pi.policyStats,
+		SpecOpts:      nil,
 	}
-	pi.policyStats = program.MapBuilderPolicy(policystats.PolicyStatsMapName, prog)
-	return pi.policyStats
+	if pi.specOpts != nil {
+		commonInfo.SpecOpts = pi.specOpts.SpecOptions
+	}
+	result := commonInfo.PolicyStatsMap(prog)
+	pi.policyStats = result
+	return result
 }
 
 func (pi *policyInfo) policyConfMap(prog *program.Program) *program.Map {
-	if pi.policyConf != nil {
-		return program.MapUserFrom(pi.policyConf)
+	// Convert to common.PolicyInfo temporarily to use common method
+	commonInfo := &common.PolicyInfo{
+		Name:          pi.name,
+		Namespace:     pi.namespace,
+		PolicyID:      pi.policyID,
+		CustomHandler: pi.customHandler,
+		PolicyConf:    pi.policyConf,
+		PolicyStats:   pi.policyStats,
+		SpecOpts:      nil,
 	}
-	pi.policyConf = program.MapBuilderPolicy(policyconf.PolicyConfMapName, prog)
-	prog.MapLoad = append(prog.MapLoad, &program.MapLoad{
-		Name: policyconf.PolicyConfMapName,
-		Load: func(m *ebpf.Map, _ string) error {
-			mode := policyconf.EnforceMode
-			if pi.specOpts != nil {
-				mode = pi.specOpts.policyMode
-			}
-			conf := policyconf.PolicyConf{
-				Mode: mode,
-			}
-			key := uint32(0)
-			return m.Update(key, &conf, ebpf.UpdateAny)
-		},
-	})
-	return pi.policyConf
+	if pi.specOpts != nil {
+		commonInfo.SpecOpts = pi.specOpts.SpecOptions
+	}
+	result := commonInfo.PolicyConfMap(prog)
+	pi.policyConf = result
+	return result
 }
 
 func (h policyHandler) PolicyHandler(

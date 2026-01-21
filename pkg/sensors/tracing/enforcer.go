@@ -16,11 +16,11 @@ import (
 	"github.com/cilium/tetragon/pkg/bpf"
 	"github.com/cilium/tetragon/pkg/k8s/apis/cilium.io/v1alpha1"
 	"github.com/cilium/tetragon/pkg/logger"
-	"github.com/cilium/tetragon/pkg/metrics/enforcermetrics"
 	"github.com/cilium/tetragon/pkg/option"
 	"github.com/cilium/tetragon/pkg/policyfilter"
 	"github.com/cilium/tetragon/pkg/sensors"
 	"github.com/cilium/tetragon/pkg/sensors/program"
+	"github.com/cilium/tetragon/pkg/sensors/tracing/common"
 	"github.com/cilium/tetragon/pkg/tracingpolicy"
 )
 
@@ -50,12 +50,7 @@ func init() {
 }
 
 func enforcerMaps(load *program.Program) []*program.Map {
-	edm := program.MapBuilderPolicy(EnforcerDataMapName, load)
-	edm.SetMaxEntries(enforcerMapMaxEntries)
-	return []*program.Map{
-		edm,
-		program.MapBuilderPolicy(enforcermetrics.EnforcerMissedMapName, load),
-	}
+	return common.EnforcerMaps(load)
 }
 
 func (kp *enforcerPolicy) enforcerGet(name string) (*enforcerHandler, bool) {
@@ -164,29 +159,9 @@ func (kp *enforcerPolicy) LoadProbe(args sensors.LoadProbeArgs) error {
 	return fmt.Errorf("enforcer loader: unknown label: %s", args.Load.Label)
 }
 
-// select proper override method based on configuration and spec options
+// selectOverrideMethod is a wrapper for common.SelectOverrideMethod
 func selectOverrideMethod(overrideMethod OverrideMethod, hasSyscall bool) (OverrideMethod, error) {
-	switch overrideMethod {
-	case OverrideMethodDefault:
-		// by default, first try OverrideReturn and if this does not work try fmod_ret
-		if bpf.HasOverrideHelper() {
-			overrideMethod = OverrideMethodReturn
-		} else if bpf.HasModifyReturnSyscall() {
-			overrideMethod = OverrideMethodFmodRet
-		} else {
-			return OverrideMethodInvalid, errors.New("no override helper or mod_ret support: cannot load enforcer")
-		}
-	case OverrideMethodReturn:
-		if !bpf.HasOverrideHelper() {
-			return OverrideMethodInvalid, errors.New("option override return set, but it is not supported")
-		}
-	case OverrideMethodFmodRet:
-		if !bpf.HasModifyReturn() || (hasSyscall && !bpf.HasModifyReturnSyscall()) {
-			return OverrideMethodInvalid, errors.New("option fmod_ret set, but it is not supported")
-		}
-	}
-
-	return overrideMethod, nil
+	return common.SelectOverrideMethod(overrideMethod, hasSyscall)
 }
 
 func (kp *enforcerPolicy) createEnforcerSensor(

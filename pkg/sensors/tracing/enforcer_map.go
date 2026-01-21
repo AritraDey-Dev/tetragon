@@ -12,11 +12,12 @@ import (
 	"github.com/cilium/ebpf"
 
 	"github.com/cilium/tetragon/pkg/bpf"
+	"github.com/cilium/tetragon/pkg/sensors/tracing/common"
 	"github.com/cilium/tetragon/pkg/tracingpolicy"
 )
 
 const (
-	EnforcerDataMapName = "enforcer_data"
+	EnforcerDataMapName = common.EnforcerDataMapName
 )
 
 type EnforcerMap struct {

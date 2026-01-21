@@ -3,21 +3,13 @@
 
 package tracing
 
-import "errors"
+import "github.com/cilium/tetragon/pkg/sensors/tracing/common"
 
-var errParseStringSize = errors.New("error parsing string size from binary")
+// Constants and functions for backward compatibility
+const maxStringSize = common.MaxStringSize
 
-// this is from bpf/process/types/basic.h 'MAX_STRING'
-const maxStringSize = 4096
+var errParseStringSize = common.ErrParseStringSize
 
 func kprobeCharBufErrorToString(e int32) string {
-	switch e {
-	case CharBufErrorENOMEM:
-		return "CharBufErrorENOMEM"
-	case CharBufErrorTooLarge:
-		return "CharBufErrorBufTooLarge"
-	case CharBufErrorPageFault:
-		return "CharBufErrorPageFault"
-	}
-	return "CharBufErrorUnknown"
+	return common.KprobeCharBufErrorToString(e)
 }

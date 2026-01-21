@@ -4,15 +4,10 @@
 package tracing
 
 import (
-	"github.com/cilium/tetragon/pkg/metrics/enforcermetrics"
 	"github.com/cilium/tetragon/pkg/sensors/program"
+	"github.com/cilium/tetragon/pkg/sensors/tracing/common"
 )
 
 func enforcerMapsUser(load *program.Program) []*program.Map {
-	edm := program.MapUserPolicy(EnforcerDataMapName, load)
-	edm.SetMaxEntries(enforcerMapMaxEntries)
-	return []*program.Map{
-		edm,
-		program.MapUserPolicy(enforcermetrics.EnforcerMissedMapName, load),
-	}
+	return common.EnforcerMapsUser(load)
 }

@@ -5,19 +5,20 @@
 
 package tracing
 
-const (
-	CharBufErrorENOMEM      = -1
-	CharBufErrorPageFault   = -2
-	CharBufErrorTooLarge    = -3
-	CharBufSavedForRetprobe = -4
+import "github.com/cilium/tetragon/pkg/sensors/tracing/common"
 
-	// The following values could be fine tuned if either those feature use too
-	// much kernel memory when enabled.
-	stackTraceMapMaxEntries    = 32768
-	ratelimitMapMaxEntries     = 32768
-	fdInstallMapMaxEntries     = 32000
-	enforcerMapMaxEntries      = 32768
-	overrideMapMaxEntries      = 32768
-	sleepableOffloadMaxEntries = 32768
-	socktrackMapMaxEntries     = 32000
+// Constants for backward compatibility
+const (
+	CharBufErrorENOMEM      = common.CharBufErrorENOMEM
+	CharBufErrorPageFault   = common.CharBufErrorPageFault
+	CharBufErrorTooLarge    = common.CharBufErrorTooLarge
+	CharBufSavedForRetprobe = common.CharBufSavedForRetprobe
+
+	stackTraceMapMaxEntries    = common.StackTraceMapMaxEntries
+	ratelimitMapMaxEntries     = common.RatelimitMapMaxEntries
+	fdInstallMapMaxEntries     = common.FdInstallMapMaxEntries
+	enforcerMapMaxEntries      = common.EnforcerMapMaxEntries
+	overrideMapMaxEntries      = common.OverrideMapMaxEntries
+	sleepableOffloadMaxEntries = common.SleepableOffloadMaxEntries
+	socktrackMapMaxEntries     = common.SocktrackMapMaxEntries
 )

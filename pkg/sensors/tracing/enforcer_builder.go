@@ -16,6 +16,7 @@ import (
 
 	"github.com/cilium/tetragon/pkg/k8s/apis/cilium.io/v1alpha1"
 	"github.com/cilium/tetragon/pkg/option"
+	"github.com/cilium/tetragon/pkg/sensors/tracing/common"
 )
 
 type EnforcerSpecBuilder struct {
@@ -67,12 +68,12 @@ func (ksb *EnforcerSpecBuilder) WithMatchBinaries(bins ...string) *EnforcerSpecB
 }
 
 func (ksb *EnforcerSpecBuilder) WithOverrideReturn() *EnforcerSpecBuilder {
-	ksb.overrideMethod = valOverrideReturn
+	ksb.overrideMethod = common.ValOverrideReturn
 	return ksb
 }
 
 func (ksb *EnforcerSpecBuilder) WithFmodRet() *EnforcerSpecBuilder {
-	ksb.overrideMethod = valFmodRet
+	ksb.overrideMethod = common.ValFmodRet
 	return ksb
 
 }
@@ -153,7 +154,7 @@ func (ksb *EnforcerSpecBuilder) Build() (*v1alpha1.TracingPolicy, error) {
 
 	if ksb.overrideMethod != "" {
 		options = append(options, v1alpha1.OptionSpec{
-			Name:  keyOverrideMethod,
+			Name:  common.KeyOverrideMethod,
 			Value: ksb.overrideMethod,
 		})
 	}
