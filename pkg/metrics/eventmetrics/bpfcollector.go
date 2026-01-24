@@ -10,6 +10,7 @@ import (
 	"github.com/cilium/ebpf"
 	"github.com/prometheus/client_golang/prometheus"
 
+	"github.com/cilium/tetragon/pkg/api/ops"
 	"github.com/cilium/tetragon/pkg/api/processapi"
 	"github.com/cilium/tetragon/pkg/metrics"
 	"github.com/cilium/tetragon/pkg/option"
@@ -50,16 +51,18 @@ func collect(ch chan<- prometheus.Metric) {
 	for opcode, errors := range sum.SentFailed {
 		for er, count := range errors {
 			if count > 0 {
-				ch <- MissedEvents.MustMetric(float64(count), strconv.Itoa(opcode), perfEventErrors[er])
+				op := ops.OpCode(opcode)
+				ch <- MissedEvents.MustMetric(float64(count), strconv.Itoa(opcode), op.String(), perfEventErrors[er])
 			}
 		}
 	}
 }
 
 func collectForDocs(ch chan<- prometheus.Metric) {
-	for _, opcode := range metrics.OpCodeLabel.Values {
+	for i, opcode := range metrics.OpCodeLabel.Values {
+		name := metrics.OpCodeNameLabel.Values[i]
 		for _, er := range perfEventErrorLabel.Values {
-			ch <- MissedEvents.MustMetric(0, opcode, er)
+			ch <- MissedEvents.MustMetric(0, opcode, name, er)
 		}
 	}
 }
