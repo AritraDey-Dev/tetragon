@@ -35,8 +35,8 @@ var (
 		Name:   "event",
 		Values: slices.Collect(maps.Values(DataEventTypeStrings)),
 	}
-	opLabel = metrics.ConstrainedLabel{
-		Name:   "op",
+	statusLabel = metrics.ConstrainedLabel{
+		Name:   "status",
 		Values: []string{DataEventOpOk.String(), DataEventOpBad.String()},
 	}
 
@@ -55,7 +55,7 @@ var (
 			Opts: metrics.NewOpts(
 				consts.MetricsNamespace, "", "data_event_size",
 				"The size of received data events.",
-				nil, []metrics.ConstrainedLabel{opLabel}, nil,
+				nil, []metrics.ConstrainedLabel{statusLabel}, nil,
 			),
 			Buckets: prometheus.LinearBuckets(1000, 2000, 20),
 		},
