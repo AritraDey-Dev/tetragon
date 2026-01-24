@@ -59,6 +59,10 @@ var (
 		// These are numbers, not human-readable names.
 		Values: getOpcodes(),
 	}
+	OpCodeNameLabel = ConstrainedLabel{
+		Name:   "msg_op_name",
+		Values: getOpcodeNames(),
+	}
 	EventTypeLabel = ConstrainedLabel{
 		Name:   "event_type",
 		Values: getEventTypes(),
@@ -71,6 +75,18 @@ func getOpcodes() []string {
 	for opcode := range ops.OpCodeStrings {
 		if opcode != ops.MSG_OP_UNDEF && opcode != ops.MSG_OP_TEST {
 			result[i] = strconv.Itoa(int(int32(opcode)))
+			i++
+		}
+	}
+	return result
+}
+
+func getOpcodeNames() []string {
+	result := make([]string, len(ops.OpCodeStrings)-2)
+	i := 0
+	for opcode, name := range ops.OpCodeStrings {
+		if opcode != ops.MSG_OP_UNDEF && opcode != ops.MSG_OP_TEST {
+			result[i] = name
 			i++
 		}
 	}
