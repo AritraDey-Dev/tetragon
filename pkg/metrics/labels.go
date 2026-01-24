@@ -52,8 +52,6 @@ func promContainsLabel(labels prometheus.ConstrainedLabels, label string) bool {
 }
 
 var (
-	// TODO: Standardize labels used by different metrics: op, msg_op, opcode.
-	// Also, add a human-readable counterpart.
 	OpCodeLabel = ConstrainedLabel{
 		Name: "msg_op",
 		// These are numbers, not human-readable names.

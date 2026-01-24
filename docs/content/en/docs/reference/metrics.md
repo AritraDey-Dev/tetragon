@@ -29,6 +29,7 @@ Number of Tetragon perf events that are failed to be sent from the kernel.
 | ----- | ------ |
 | `error` | `E2BIG, EAGAIN, EBUSY, EINVAL, ENOENT, ENOSPC, unknown` |
 | `msg_op` | `13, 14, 15, 16, 23, 24, 25, 26, 27, 28, 5, 7` |
+| `msg_op_name` | `Cgroup, Clone, Data, Execve, Exit, GenericKprobe, GenericLSM, GenericTracepoint, GenericUSDT, GenericUprobe, Loader, Throttle` |
 
 ### `tetragon_build_info`
 
@@ -84,7 +85,7 @@ The size of received data events.
 
 | label | values |
 | ----- | ------ |
-| `op   ` | `bad, ok` |
+| `status` | `bad, ok` |
 
 ### `tetragon_data_events_total`
 
@@ -208,7 +209,8 @@ The total number of event handler errors. For internal use only.
 | label | values |
 | ----- | ------ |
 | `error_type` | `event_handler_failed, unknown_opcode` |
-| `opcode` | `0, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28, 5, 7` |
+| `msg_op` | `0, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28, 5, 7` |
+| `msg_op_name` | `Cgroup, Clone, Data, Execve, Exit, GenericKprobe, GenericLSM, GenericTracepoint, GenericUSDT, GenericUprobe, Loader, Throttle, Undef` |
 
 ### `tetragon_handling_latency`
 
@@ -216,7 +218,8 @@ The latency of handling messages in us.
 
 | label | values |
 | ----- | ------ |
-| `op   ` | `13, 14, 15, 16, 23, 24, 25, 26, 27, 28, 5, 7` |
+| `msg_op` | `13, 14, 15, 16, 23, 24, 25, 26, 27, 28, 5, 7` |
+| `msg_op_name` | `Cgroup, Clone, Data, Execve, Exit, GenericKprobe, GenericLSM, GenericTracepoint, GenericUSDT, GenericUprobe, Loader, Throttle` |
 
 ### `tetragon_map_capacity`
 
@@ -275,6 +278,7 @@ The total number of times we encounter a given message opcode. For internal use 
 | label | values |
 | ----- | ------ |
 | `msg_op` | `13, 14, 15, 16, 23, 24, 25, 26, 27, 28, 5, 7` |
+| `msg_op_name` | `Cgroup, Clone, Data, Execve, Exit, GenericKprobe, GenericLSM, GenericTracepoint, GenericUSDT, GenericUprobe, Loader, Throttle` |
 
 ### `tetragon_notify_overflowed_events_total`
 
