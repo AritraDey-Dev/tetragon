@@ -33,6 +33,34 @@ import (
 	"github.com/cilium/tetragon/pkg/tracingpolicy"
 )
 
+// filterEnvVars filters the process environment variables to only include
+// those whose keys are in the requested list. If the requested list is empty,
+// no environment variables are returned.
+func filterEnvVars(proc *process.ProcessInternal, requested []string) []*tetragon.EnvVar {
+	if len(requested) == 0 || proc == nil {
+		return nil
+	}
+
+	processEnvs := proc.UnsafeGetProcess().GetEnvironmentVariables()
+	if len(processEnvs) == 0 {
+		return nil
+	}
+
+	// Build a set of requested env var names for fast lookup
+	requestedSet := make(map[string]struct{}, len(requested))
+	for _, name := range requested {
+		requestedSet[name] = struct{}{}
+	}
+
+	var result []*tetragon.EnvVar
+	for _, env := range processEnvs {
+		if _, ok := requestedSet[env.Key]; ok {
+			result = append(result, env)
+		}
+	}
+	return result
+}
+
 func getProcessParent(key *processapi.MsgExecveKey, flags uint8) (*process.ProcessInternal, *process.ProcessInternal, *tetragon.Process, *tetragon.Process) {
 	var tetragonParent, tetragonProcess *tetragon.Process
 
@@ -378,6 +406,7 @@ func GetProcessKprobe(event *MsgGenericKprobeUnix) *tetragon.ProcessKprobe {
 		PolicyName:       event.PolicyName,
 		Message:          event.Message,
 		Tags:             event.Tags,
+		Envs:             filterEnvVars(proc, event.Envs),
 	}
 
 	if tetragonProcess.Pid == nil {
