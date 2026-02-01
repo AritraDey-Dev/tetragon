@@ -131,6 +131,9 @@ type genericKprobe struct {
 	hasStackTrace bool
 
 	customHandler eventhandler.Handler
+
+	// envs is the list of environment variable names to export with events
+	envs []string
 }
 
 // pendingEvent is an event waiting to be merged with another event.
@@ -986,6 +989,7 @@ func addKprobe(funcName string, instance int, f *v1alpha1.KProbeSpec, in *addKpr
 		message:           msgField,
 		tags:              tagsField,
 		hasStackTrace:     selectors.HasStackTrace(f.Selectors),
+		envs:              f.Envs,
 	}
 
 	// Parse Filters into kernel filter logic
@@ -1363,6 +1367,7 @@ func handleMsgGenericKprobe(m *api.MsgGenericKprobe, gk *genericKprobe, r *bytes
 	unix.PolicyName = gk.policyName
 	unix.Message = gk.message
 	unix.Tags = gk.tags
+	unix.Envs = gk.envs
 
 	returnEvent := m.Common.Flags&processapi.MSG_COMMON_FLAG_RETURN != 0
 

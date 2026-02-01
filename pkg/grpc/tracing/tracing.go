@@ -722,6 +722,8 @@ type MsgGenericKprobeUnix struct {
 	KernelStackTrace [constants.PERF_MAX_STACK_DEPTH]uint64
 	UserStackTrace   [constants.PERF_MAX_STACK_DEPTH]uint64
 	Tags             []string
+	// Envs is the list of environment variable names to export with this event
+	Envs []string
 }
 
 func (msg *MsgGenericKprobeUnix) GetArgs() *[]tracingapi.MsgGenericKprobeArg {
