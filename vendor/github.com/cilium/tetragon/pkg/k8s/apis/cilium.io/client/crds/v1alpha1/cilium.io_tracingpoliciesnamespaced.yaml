@@ -344,6 +344,12 @@ spec:
                         - type
                         type: object
                       type: array
+                    envs:
+                      description: List of environment variable names to export with
+                        the event.
+                      items:
+                        type: string
+                      type: array
                     ignore:
                       description: Conditions for ignoring this kprobe
                       properties:
@@ -1255,6 +1261,12 @@ spec:
                         - type
                         type: object
                       type: array
+                    envs:
+                      description: List of environment variable names to export with
+                        the event.
+                      items:
+                        type: string
+                      type: array
                     hook:
                       description: Name of the function to apply the kprobe spec to.
                       type: string
@@ -2075,6 +2087,12 @@ spec:
                         - index
                         - type
                         type: object
+                      type: array
+                    envs:
+                      description: List of environment variable names to export with
+                        the event.
+                      items:
+                        type: string
                       type: array
                     event:
                       description: Tracepoint event
@@ -2954,6 +2972,12 @@ spec:
                         - index
                         - type
                         type: object
+                      type: array
+                    envs:
+                      description: List of environment variable names to export with
+                        the event.
+                      items:
+                        type: string
                       type: array
                     message:
                       description: |-
@@ -3841,6 +3865,12 @@ spec:
                     btfPath:
                       description: path for a BTF file for the traced binary
                       type: string
+                    envs:
+                      description: List of environment variable names to export with
+                        the event.
+                      items:
+                        type: string
+                      type: array
                     message:
                       description: |-
                         A short message of 256 characters max that will be included

@@ -67,6 +67,9 @@ type KProbeSpec struct {
 	// +kubebuilder:validation:Optional
 	// Conditions for ignoring this kprobe
 	Ignore *KprobeIgnore `json:"ignore,omitempty"`
+	// +kubebuilder:validation:Optional
+	// List of environment variable names to export with the event.
+	Envs []string `json:"envs,omitempty"`
 }
 
 type KProbeArg struct {
@@ -330,6 +333,9 @@ type TracepointSpec struct {
 	// +kubebuilder:validation:Optional
 	// Enable raw tracepoint arguments
 	Raw bool `json:"raw,omitempty"`
+	// +kubebuilder:validation:Optional
+	// List of environment variable names to export with the event.
+	Envs []string `json:"envs,omitempty"`
 }
 
 type UProbeSpec struct {
@@ -375,6 +381,9 @@ type UProbeSpec struct {
 	// +kubebuilder:validation:Optional
 	// A return argument to include in the trace output.
 	ReturnArg *KProbeArg `json:"returnArg,omitempty"`
+	// +kubebuilder:validation:Optional
+	// List of environment variable names to export with the event.
+	Envs []string `json:"envs,omitempty"`
 }
 
 type UsdtSpec struct {
@@ -402,6 +411,9 @@ type UsdtSpec struct {
 	// +kubebuilder:validation:Optional
 	// Selectors to apply before producing trace output. Selectors are ORed.
 	Selectors []KProbeSelector `json:"selectors,omitempty"`
+	// +kubebuilder:validation:Optional
+	// List of environment variable names to export with the event.
+	Envs []string `json:"envs,omitempty"`
 }
 
 type LsmHookSpec struct {
@@ -422,6 +434,9 @@ type LsmHookSpec struct {
 	// Tags to categorize the event, will be include in the event output.
 	// Maximum of 16 Tags are supported.
 	Tags []string `json:"tags,omitempty"`
+	// +kubebuilder:validation:Optional
+	// List of environment variable names to export with the event.
+	Envs []string `json:"envs,omitempty"`
 }
 
 type ListSpec struct {
