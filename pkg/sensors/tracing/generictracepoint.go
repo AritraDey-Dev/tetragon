@@ -98,6 +98,9 @@ type genericTracepoint struct {
 
 	// is raw tracepoint
 	raw bool
+
+	// envs is the list of environment variable names to export with events
+	envs []string
 }
 
 func (tp *genericTracepoint) SetID(id idtable.EntryID) {
@@ -405,6 +408,7 @@ func createGenericTracepoint(
 		message:       msgField,
 		tags:          tagsField,
 		raw:           conf.Raw,
+		envs:          conf.Envs,
 	}
 
 	genericTracepointTable.AddEntry(ret)
@@ -851,6 +855,7 @@ func handleMsgGenericTracepoint(
 	unix.PolicyName = tp.policyName
 	unix.Message = tp.message
 	unix.Tags = tp.tags
+	unix.Envs = tp.envs
 
 	for idx, out := range tp.args {
 

@@ -80,6 +80,9 @@ type genericUprobe struct {
 	// generated. The events are maintained in the map below, using
 	// the retprobe_id (thread_id) and the enter ktime as the key.
 	pendingEvents *lru.Cache[pendingEventKey, pendingEvent[*tracing.MsgGenericUprobeUnix]]
+
+	// envs is the list of environment variable names to export with events
+	envs []string
 }
 
 func populateUprobeRegs(m *ebpf.Map, regs []processapi.RegAssignment) error {
@@ -140,6 +143,7 @@ func handleGenericUprobe(r *bytes.Reader) ([]observer.Event, error) {
 	unix.PolicyName = uprobeEntry.policyName
 	unix.Message = uprobeEntry.message
 	unix.Tags = uprobeEntry.tags
+	unix.Envs = uprobeEntry.envs
 
 	returnEvent := m.Common.Flags&processapi.MSG_COMMON_FLAG_RETURN != 0
 
@@ -732,6 +736,7 @@ func addUprobe(spec *v1alpha1.UProbeSpec, ids []idtable.EntryID, in *addUprobeIn
 			argReturnPrinters: argReturnPrinters,
 			tags:              tagsField,
 			pendingEvents:     nil,
+			envs:              spec.Envs,
 		}
 
 		uprobeEntry.pendingEvents, err = lru.New[pendingEventKey, pendingEvent[*tracing.MsgGenericUprobeUnix]](option.Config.RetprobesCacheSize)

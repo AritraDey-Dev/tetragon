@@ -71,6 +71,8 @@ type genericLsm struct {
 	tags []string
 	// is IMA hash collector program needed to load
 	imaProgLoad bool
+	// envs is the list of environment variable names to export with events
+	envs []string
 }
 
 func (g *genericLsm) SetID(id idtable.EntryID) {
@@ -138,6 +140,7 @@ func handleGenericLsm(r *bytes.Reader) ([]observer.Event, error) {
 	unix.PolicyName = gl.policyName
 	unix.Message = gl.message
 	unix.Tags = gl.tags
+	unix.Envs = gl.envs
 
 	printers := gl.argPrinters
 
@@ -304,6 +307,7 @@ func addLsm(f *v1alpha1.LsmHookSpec, in *addLsmIn) (id idtable.EntryID, err erro
 		message:     msgField,
 		tags:        tagsField,
 		imaProgLoad: false,
+		envs:        f.Envs,
 	}
 
 	for _, sel := range f.Selectors {

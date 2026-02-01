@@ -517,6 +517,7 @@ type MsgGenericTracepointUnix struct {
 	PolicyName string
 	Message    string
 	Tags       []string
+	Envs       []string
 }
 
 func (msg *MsgGenericTracepointUnix) Notify() bool {
@@ -695,6 +696,7 @@ func (msg *MsgGenericTracepointUnix) HandleMessage() *tetragon.GetEventsResponse
 		Message:    msg.Message,
 		Tags:       msg.Tags,
 		Action:     kprobeAction(msg.Msg.ActionId),
+		Envs:       filterEnvVars(proc, msg.Envs),
 	}
 
 	if tetragonProcess.Pid == nil {
@@ -879,6 +881,7 @@ type MsgGenericUprobeUnix struct {
 	Args         []tracingapi.MsgGenericKprobeArg
 	Data         []tracingapi.MsgGenericKprobeArg
 	Tags         []string
+	Envs         []string
 }
 
 func (msg *MsgGenericUprobeUnix) GetArgs() *[]tracingapi.MsgGenericKprobeArg {
@@ -941,6 +944,7 @@ func GetProcessUprobe(event *MsgGenericUprobeUnix) *tetragon.ProcessUprobe {
 		Offset:       event.Offset,
 		RefCtrOffset: event.RefCtrOffset,
 		Action:       kprobeAction(event.Msg.ActionId),
+		Envs:         filterEnvVars(proc, event.Envs),
 	}
 
 	if tetragonProcess.Pid == nil {
@@ -995,6 +999,7 @@ type MsgGenericUsdtUnix struct {
 	Message    string
 	Args       []tracingapi.MsgGenericKprobeArg
 	Tags       []string
+	Envs       []string
 }
 
 func (msg *MsgGenericUsdtUnix) Notify() bool {
@@ -1047,6 +1052,7 @@ func GetProcessUsdt(event *MsgGenericUsdtUnix) *tetragon.ProcessUsdt {
 		Args:       tetragonArgs,
 		Tags:       event.Tags,
 		Action:     kprobeAction(event.Msg.ActionId),
+		Envs:       filterEnvVars(proc, event.Envs),
 	}
 
 	if tetragonProcess.Pid == nil {
@@ -1105,6 +1111,7 @@ type MsgGenericLsmUnix struct {
 	Message    string
 	Tags       []string
 	ImaHash    MsgImaHash
+	Envs       []string
 }
 
 func (msg *MsgGenericLsmUnix) Notify() bool {
@@ -1172,6 +1179,7 @@ func GetProcessLsm(event *MsgGenericLsmUnix) *tetragon.ProcessLsm {
 		PolicyName:   event.PolicyName,
 		Message:      event.Message,
 		Tags:         event.Tags,
+		Envs:         filterEnvVars(proc, event.Envs),
 	}
 
 	switch event.ImaHash.Algo {

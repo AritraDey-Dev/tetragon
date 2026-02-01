@@ -59,6 +59,8 @@ type genericUsdt struct {
 	tags []string
 	// selector
 	selectors *selectors.KernelSelectorState
+	// envs is the list of environment variable names to export with events
+	envs []string
 }
 
 func (g *genericUsdt) SetID(id idtable.EntryID) {
@@ -383,6 +385,7 @@ func addUsdt(spec *v1alpha1.UsdtSpec, in *addUsdtIn, ids []idtable.EntryID) ([]i
 			tags:        tagsField,
 			message:     msgField,
 			selectors:   state,
+			envs:        spec.Envs,
 		}
 
 		usdtTable.AddEntry(usdtEntry)
@@ -529,6 +532,7 @@ func handleGenericUsdt(r *bytes.Reader) ([]observer.Event, error) {
 	unix.PolicyName = uprobeUsdt.policyName
 	unix.Message = uprobeUsdt.message
 	unix.Tags = uprobeUsdt.tags
+	unix.Envs = uprobeUsdt.envs
 
 	// Get argument objects for specific printers/types
 	for _, a := range uprobeUsdt.argPrinters {
