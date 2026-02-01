@@ -551,6 +551,9 @@ message ProcessKprobe {
   repeated Process ancestors = 13;
   // Data definition of the observed kprobe.
   repeated KprobeArgument data = 14;
+  // Environment variables to export with this event. These are selected from
+  // the process's environment based on the policy configuration.
+  repeated EnvVar envs = 15;
 }
 
 message ProcessTracepoint {
@@ -575,6 +578,9 @@ message ProcessTracepoint {
   repeated string tags = 10;
   // Ancestors of the process beyond the immediate parent.
   repeated Process ancestors = 11;
+  // Environment variables to export with this event. These are selected from
+  // the process's environment based on the policy configuration.
+  repeated EnvVar envs = 12;
 }
 
 message ProcessUprobe {
@@ -600,6 +606,9 @@ message ProcessUprobe {
   KprobeAction action = 12;
   // Data definition of the observed uprobe.
   repeated KprobeArgument data = 13;
+  // Environment variables to export with this event. These are selected from
+  // the process's environment based on the policy configuration.
+  repeated EnvVar envs = 14;
 }
 
 message ProcessUsdt {
@@ -623,6 +632,9 @@ message ProcessUsdt {
   // Flags are for debugging purposes only and should not be considered a
   // reliable source of information.
   string flags = 12;
+  // Environment variables to export with this event. These are selected from
+  // the process's environment based on the policy configuration.
+  repeated EnvVar envs = 13;
 }
 
 message ProcessLsm {
@@ -644,6 +656,9 @@ message ProcessLsm {
   repeated Process ancestors = 10;
   // IMA file hash. Format algorithm:value.
   string ima_hash = 11;
+  // Environment variables to export with this event. These are selected from
+  // the process's environment based on the policy configuration.
+  repeated EnvVar envs = 12;
 }
 
 message KernelModule {

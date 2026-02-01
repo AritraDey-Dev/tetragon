@@ -1140,6 +1140,7 @@ Environment variable
 | user_stack_trace | [StackTraceEntry](#tetragon-StackTraceEntry) | repeated | User-mode stack trace to the call. |
 | ancestors | [Process](#tetragon-Process) | repeated | Ancestors of the process beyond the immediate parent. |
 | data | [KprobeArgument](#tetragon-KprobeArgument) | repeated | Data definition of the observed kprobe. |
+| envs | [EnvVar](#tetragon-EnvVar) | repeated | Environment variables to export with this event. These are selected from the process&#39;s environment based on the policy configuration. |
 
 
 
@@ -1183,6 +1184,7 @@ loader sensor event triggered for loaded binary/library
 | tags | [string](#string) | repeated | Tags of the Tracing Policy to categorize the event. |
 | ancestors | [Process](#tetragon-Process) | repeated | Ancestors of the process beyond the immediate parent. |
 | ima_hash | [string](#string) |  | IMA file hash. Format algorithm:value. |
+| envs | [EnvVar](#tetragon-EnvVar) | repeated | Environment variables to export with this event. These are selected from the process&#39;s environment based on the policy configuration. |
 
 
 
@@ -1207,6 +1209,7 @@ loader sensor event triggered for loaded binary/library
 | message | [string](#string) |  | Short message of the Tracing Policy to inform users what is going on. |
 | tags | [string](#string) | repeated | Tags of the Tracing Policy to categorize the event. |
 | ancestors | [Process](#tetragon-Process) | repeated | Ancestors of the process beyond the immediate parent. |
+| envs | [EnvVar](#tetragon-EnvVar) | repeated | Environment variables to export with this event. These are selected from the process&#39;s environment based on the policy configuration. |
 
 
 
@@ -1234,6 +1237,7 @@ loader sensor event triggered for loaded binary/library
 | ref_ctr_offset | [uint64](#uint64) |  | uprobe ref_ctr_offset |
 | action | [KprobeAction](#tetragon-KprobeAction) |  | Action performed when the uprobe hook matched. |
 | data | [KprobeArgument](#tetragon-KprobeArgument) | repeated | Data definition of the observed uprobe. |
+| envs | [EnvVar](#tetragon-EnvVar) | repeated | Environment variables to export with this event. These are selected from the process&#39;s environment based on the policy configuration. |
 
 
 
@@ -1260,6 +1264,7 @@ loader sensor event triggered for loaded binary/library
 | ancestors | [Process](#tetragon-Process) | repeated | Ancestors of the process beyond the immediate parent. |
 | action | [KprobeAction](#tetragon-KprobeAction) |  | Action performed when the USDT hook matched. |
 | flags | [string](#string) |  | Flags are for debugging purposes only and should not be considered a reliable source of information. |
+| envs | [EnvVar](#tetragon-EnvVar) | repeated | Environment variables to export with this event. These are selected from the process&#39;s environment based on the policy configuration. |
 
 
 
