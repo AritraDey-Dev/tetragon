@@ -51,3 +51,19 @@ func TestFentryWithoutEnforcementIsMonitorOnly(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, policyconf.MonitorOnlyMode, polInfo.specOpts.policyMode)
 }
+func TestFentryEnforcementActionsAccepted(t *testing.T) {
+	// These compile to a no-op for GENERIC_FENTRY, so they must be rejected
+	// rather than silently doing nothing.
+	for _, action := range []string{"Override", "NotifyEnforcer", "Set"} {
+		t.Run(action+" is rejected", func(t *testing.T) {
+			err := checkFentryEnforcement(fentrySpecWithAction(action).Fentries)
+			require.Error(t, err)
+		})
+	}
+
+	for _, action := range []string{"Sigkill", "Signal", "Post"} {
+		t.Run(action+" is accepted", func(t *testing.T) {
+			require.NoError(t, checkFentryEnforcement(fentrySpecWithAction(action).Fentries))
+		})
+	}
+}
