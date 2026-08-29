@@ -54,6 +54,12 @@ func hasEnforcementActions(spec *v1alpha1.TracingPolicySpec) bool {
 		}
 	}
 
+	for _, fentry := range spec.Fentries {
+		if selectors.HasEnforcementAction(fentry.Selectors) || selectors.HasOverride(fentry.Selectors) {
+			return true
+		}
+	}
+
 	for _, uprobe := range spec.UProbes {
 		if selectors.HasEnforcementAction(uprobe.Selectors) || selectors.HasOverride(uprobe.Selectors) {
 			return true
