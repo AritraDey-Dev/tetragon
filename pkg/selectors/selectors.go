@@ -101,11 +101,21 @@ type KernelSelectorMaps struct {
 	stringPostfixMaps []map[KernelLPMTrieStringPostfix]struct{}
 }
 
+// MatchBinariesSelectorFlags are the flags of MatchBinariesSelectorOptions.
+// Keep in sync with the MB_FLAG_* defines in bpf/process/types/basic.h.
+const (
+	// MBFlagMatchExecPath additionally matches the path the process was
+	// started with, before the kernel resolved it.
+	MBFlagMatchExecPath uint32 = 1 << 0
+)
+
 type MatchBinariesSelectorOptions struct {
 	Op    uint32
 	MapID uint32
 	// matchBinaries set for the selector
 	MBSetID uint32
+	// bitwise or of MBFlag* values
+	Flags uint32
 }
 
 type KernelSelectorData struct {

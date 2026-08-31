@@ -1596,6 +1596,19 @@ func ParseMatchBinary(k *KernelSelectorState, b *v1alpha1.BinarySelector, selIdx
 		}
 	}
 
+	if b.MatchExecPath {
+		if selectorType != matchBinaries {
+			return fmt.Errorf("%s: matchExecPath is only supported for matchBinaries", selectorType)
+		}
+		if op != SelectorOpIn && op != SelectorOpNotIn {
+			return fmt.Errorf("%s: matchExecPath is not supported for operation '%s', use 'In' or 'NotIn'", selectorType, b.Operator)
+		}
+		if !option.Config.ExecPathMapEnabled {
+			return fmt.Errorf("%s: matchExecPath can be used only with the exec path map enabled", selectorType)
+		}
+		sel.Flags |= MBFlagMatchExecPath
+	}
+
 	switch op {
 	case SelectorOpIn, SelectorOpNotIn:
 		for _, s := range b.Values {

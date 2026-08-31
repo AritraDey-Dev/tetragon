@@ -204,6 +204,9 @@ func createGenericUsdtSensor(
 	if option.Config.ParentsMapEnabled {
 		maps = append(maps, program.MapUserFrom(base.ParentBinariesMap))
 	}
+	if option.Config.ExecPathMapEnabled {
+		maps = append(maps, program.MapUserFrom(base.ExecPathMap))
+	}
 
 	return &sensors.Sensor{
 		Name:      name,

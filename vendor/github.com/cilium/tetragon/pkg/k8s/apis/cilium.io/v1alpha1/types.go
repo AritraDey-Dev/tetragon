@@ -131,6 +131,14 @@ type BinarySelector struct {
 	// +kubebuilder:validation:Optional
 	// +kubebuilder:default=false
 	FollowChildren bool `json:"followChildren"`
+	// Also match the path the process was started with, before the kernel
+	// resolved it. Without this, values must be the resolved path of the
+	// binary, so a policy written against a symlink never matches. Note that
+	// this widens what the selector matches, so it should not be used to build
+	// allow lists.
+	// +kubebuilder:validation:Optional
+	// +kubebuilder:default=false
+	MatchExecPath bool `json:"matchExecPath"`
 }
 
 // KProbeSelector selects function calls for kprobe based on PIDs and function arguments. The

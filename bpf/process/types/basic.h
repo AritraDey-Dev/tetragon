@@ -2050,10 +2050,16 @@ FUNC_INLINE size_t type_to_min_size(int type, int argm)
 
 #define INDEX_MASK 0x3ff
 
+/* matchBinaries selector flags, must be kept in sync with the Go definition in
+ * pkg/selectors.
+ */
+#define MB_FLAG_MATCH_EXEC_PATH 0x1
+
 struct match_binaries_sel_opts {
 	__u32 op;
 	__u32 map_id;
 	__u32 mbset_id;
+	__u32 flags;
 };
 
 // We need data for:
@@ -2134,6 +2140,17 @@ FUNC_INLINE int match_binaries(__u32 key, struct execve_map_value *current, stru
 			if (!path_map)
 				return 0;
 			found_key = map_lookup_elem(path_map, bin->path);
+			/* bin->path was resolved by the kernel, so a policy written
+			 * against a symlink does not match it. With matchExecPath the
+			 * selector also accepts the path the process was started with.
+			 */
+			if (!found_key && (selector_options->flags & MB_FLAG_MATCH_EXEC_PATH)) {
+				struct exec_path *exec_path;
+
+				exec_path = map_lookup_elem(&tg_exec_path, &current->key.pid);
+				if (exec_path)
+					found_key = map_lookup_elem(path_map, exec_path->path);
+			}
 			break;
 #ifdef __LARGE_BPF_PROG
 		case op_filter_str_prefix:

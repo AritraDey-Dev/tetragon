@@ -27,6 +27,7 @@ import (
 	"github.com/cilium/tetragon/pkg/config"
 	gt "github.com/cilium/tetragon/pkg/generictypes"
 	"github.com/cilium/tetragon/pkg/idtable"
+	"github.com/cilium/tetragon/pkg/option"
 )
 
 func TestWriteSelectorUint32(t *testing.T) {
@@ -1440,4 +1441,65 @@ func TestParseCapabilityMask(t *testing.T) {
 
 	_, err = parseCapabilitiesMask("CAP_PIZZA")
 	assert.Error(t, err)
+}
+
+func TestParseMatchBinaryMatchExecPath(t *testing.T) {
+	orig := option.Config.ExecPathMapEnabled
+	t.Cleanup(func() { option.Config.ExecPathMapEnabled = orig })
+
+	parse := func(t *testing.T, sel *v1alpha1.BinarySelector) (*KernelSelectorState, error) {
+		t.Helper()
+		k := NewKernelSelectorState(nil, nil, false, 0, 0, nil)
+		return k, ParseMatchBinary(k, sel, 0, matchBinaries)
+	}
+
+	t.Run("off by default", func(t *testing.T) {
+		option.Config.ExecPathMapEnabled = true
+		k, err := parse(t, &v1alpha1.BinarySelector{
+			Operator: "In", Values: []string{"/usr/bin/ls"},
+		})
+		require.NoError(t, err)
+		assert.Zero(t, k.MatchBinaries()[0].Flags)
+	})
+
+	t.Run("sets the flag when requested", func(t *testing.T) {
+		option.Config.ExecPathMapEnabled = true
+		k, err := parse(t, &v1alpha1.BinarySelector{
+			Operator: "In", Values: []string{"/usr/bin/ls"}, MatchExecPath: true,
+		})
+		require.NoError(t, err)
+		assert.Equal(t, MBFlagMatchExecPath, k.MatchBinaries()[0].Flags&MBFlagMatchExecPath)
+	})
+
+	t.Run("works with NotIn as well", func(t *testing.T) {
+		option.Config.ExecPathMapEnabled = true
+		k, err := parse(t, &v1alpha1.BinarySelector{
+			Operator: "NotIn", Values: []string{"/usr/bin/ls"}, MatchExecPath: true,
+		})
+		require.NoError(t, err)
+		assert.Equal(t, MBFlagMatchExecPath, k.MatchBinaries()[0].Flags&MBFlagMatchExecPath)
+	})
+
+	t.Run("rejected without the exec path map", func(t *testing.T) {
+		option.Config.ExecPathMapEnabled = false
+		_, err := parse(t, &v1alpha1.BinarySelector{
+			Operator: "In", Values: []string{"/usr/bin/ls"}, MatchExecPath: true,
+		})
+		require.ErrorContains(t, err, "exec path map")
+	})
+
+	// Prefix and Postfix match against a resolved path prefix, there is nothing
+	// sensible to compare the unresolved path against, so they are rejected.
+	for _, op := range []string{"Prefix", "NotPrefix", "Postfix", "NotPostfix"} {
+		t.Run("rejected for "+op, func(t *testing.T) {
+			if !config.EnableLargeProgs() {
+				t.Skip("Test requires kernel 5.3")
+			}
+			option.Config.ExecPathMapEnabled = true
+			_, err := parse(t, &v1alpha1.BinarySelector{
+				Operator: op, Values: []string{"/usr/bin/"}, MatchExecPath: true,
+			})
+			require.ErrorContains(t, err, "matchExecPath")
+		})
+	}
 }
