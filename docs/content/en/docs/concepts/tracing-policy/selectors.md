@@ -355,6 +355,53 @@ The available operators for `matchBinaries` are:
 
 The `values` field has to be a map of `strings`.
 
+### Symlinked binaries
+
+On kernels 5.3 and later, `matchBinaries` compares against the path the kernel
+resolved for the executable, not the path the process was started with. The two
+differ whenever a binary is invoked through a symlink: running `/bin/ls` on a
+system where that is a symlink to busybox matches `/bin/busybox`, and a policy
+written against `/bin/ls` does not match at all. Nothing is logged when this
+happens, the selector simply never fires.
+
+Use `realpath` to find the value to write in a policy:
+
+```shell
+realpath /bin/ls
+```
+
+Alternatively, set `matchExecPath` to `true` to have the selector accept the
+path the process was started with as well:
+
+```yaml
+- matchBinaries:
+  - operator: "In"
+    values:
+    - "/bin/ls"
+    matchExecPath: true
+```
+
+With the example above the selector matches both `/bin/ls` and the binary it
+resolves to. This requires the agent to run with `--exec-path-map-enabled`,
+which makes Tetragon record the unresolved path for every process; loading a
+policy that uses `matchExecPath` without it fails.
+
+There are a number of limitations when using `matchExecPath`:
+- `operator` can be `In` or `NotIn`.
+- It is not supported on `matchParentBinaries`.
+- Processes that were already running when Tetragon started are not covered,
+  since the unresolved path is only recorded at exec time.
+- Kernels without support for large BPF programs (before 5.3) already match on
+  the unresolved path, so the option has no effect there.
+
+{{< caution >}}
+`matchExecPath` widens what a selector matches, so do not use it to build allow
+lists. A selector that permits an action for `/usr/bin/cat` and also sets
+`matchExecPath` permits it for any binary someone starts through a symlink they
+named `/usr/bin/cat`. Matching on the resolved path alone, which is the default,
+is not vulnerable to that.
+{{< /caution >}}
+
 ### Follow children
 
 The `matchBinaries` filter can be configured to also apply to children of matching processes. To do
