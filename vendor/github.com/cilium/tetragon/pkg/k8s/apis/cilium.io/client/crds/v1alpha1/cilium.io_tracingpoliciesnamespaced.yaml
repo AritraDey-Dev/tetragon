@@ -718,6 +718,15 @@ spec:
                                   description: In addition to binaries, match children
                                     processes of specified binaries.
                                   type: boolean
+                                matchExecPath:
+                                  default: false
+                                  description: |-
+                                    Also match the path the process was started with, before the kernel
+                                    resolved it. Without this, values must be the resolved path of the
+                                    binary, so a policy written against a symlink never matches. Note that
+                                    this widens what the selector matches, so it should not be used to build
+                                    allow lists.
+                                  type: boolean
                                 operator:
                                   description: Filter operation.
                                   enum:
@@ -985,6 +994,15 @@ spec:
                                   default: false
                                   description: In addition to binaries, match children
                                     processes of specified binaries.
+                                  type: boolean
+                                matchExecPath:
+                                  default: false
+                                  description: |-
+                                    Also match the path the process was started with, before the kernel
+                                    resolved it. Without this, values must be the resolved path of the
+                                    binary, so a policy written against a symlink never matches. Note that
+                                    this widens what the selector matches, so it should not be used to build
+                                    allow lists.
                                   type: boolean
                                 operator:
                                   description: Filter operation.
@@ -2071,6 +2089,15 @@ spec:
                                   description: In addition to binaries, match children
                                     processes of specified binaries.
                                   type: boolean
+                                matchExecPath:
+                                  default: false
+                                  description: |-
+                                    Also match the path the process was started with, before the kernel
+                                    resolved it. Without this, values must be the resolved path of the
+                                    binary, so a policy written against a symlink never matches. Note that
+                                    this widens what the selector matches, so it should not be used to build
+                                    allow lists.
+                                  type: boolean
                                 operator:
                                   description: Filter operation.
                                   enum:
@@ -2338,6 +2365,15 @@ spec:
                                   default: false
                                   description: In addition to binaries, match children
                                     processes of specified binaries.
+                                  type: boolean
+                                matchExecPath:
+                                  default: false
+                                  description: |-
+                                    Also match the path the process was started with, before the kernel
+                                    resolved it. Without this, values must be the resolved path of the
+                                    binary, so a policy written against a symlink never matches. Note that
+                                    this widens what the selector matches, so it should not be used to build
+                                    allow lists.
                                   type: boolean
                                 operator:
                                   description: Filter operation.
@@ -3146,6 +3182,15 @@ spec:
                                   description: In addition to binaries, match children
                                     processes of specified binaries.
                                   type: boolean
+                                matchExecPath:
+                                  default: false
+                                  description: |-
+                                    Also match the path the process was started with, before the kernel
+                                    resolved it. Without this, values must be the resolved path of the
+                                    binary, so a policy written against a symlink never matches. Note that
+                                    this widens what the selector matches, so it should not be used to build
+                                    allow lists.
+                                  type: boolean
                                 operator:
                                   description: Filter operation.
                                   enum:
@@ -3413,6 +3458,15 @@ spec:
                                   default: false
                                   description: In addition to binaries, match children
                                     processes of specified binaries.
+                                  type: boolean
+                                matchExecPath:
+                                  default: false
+                                  description: |-
+                                    Also match the path the process was started with, before the kernel
+                                    resolved it. Without this, values must be the resolved path of the
+                                    binary, so a policy written against a symlink never matches. Note that
+                                    this widens what the selector matches, so it should not be used to build
+                                    allow lists.
                                   type: boolean
                                 operator:
                                   description: Filter operation.
@@ -4181,6 +4235,15 @@ spec:
                             description: In addition to binaries, match children processes
                               of specified binaries.
                             type: boolean
+                          matchExecPath:
+                            default: false
+                            description: |-
+                              Also match the path the process was started with, before the kernel
+                              resolved it. Without this, values must be the resolved path of the
+                              binary, so a policy written against a symlink never matches. Note that
+                              this widens what the selector matches, so it should not be used to build
+                              allow lists.
+                            type: boolean
                           operator:
                             description: Filter operation.
                             enum:
@@ -4444,6 +4507,15 @@ spec:
                             default: false
                             description: In addition to binaries, match children processes
                               of specified binaries.
+                            type: boolean
+                          matchExecPath:
+                            default: false
+                            description: |-
+                              Also match the path the process was started with, before the kernel
+                              resolved it. Without this, values must be the resolved path of the
+                              binary, so a policy written against a symlink never matches. Note that
+                              this widens what the selector matches, so it should not be used to build
+                              allow lists.
                             type: boolean
                           operator:
                             description: Filter operation.
@@ -5201,6 +5273,15 @@ spec:
                                   description: In addition to binaries, match children
                                     processes of specified binaries.
                                   type: boolean
+                                matchExecPath:
+                                  default: false
+                                  description: |-
+                                    Also match the path the process was started with, before the kernel
+                                    resolved it. Without this, values must be the resolved path of the
+                                    binary, so a policy written against a symlink never matches. Note that
+                                    this widens what the selector matches, so it should not be used to build
+                                    allow lists.
+                                  type: boolean
                                 operator:
                                   description: Filter operation.
                                   enum:
@@ -5468,6 +5549,15 @@ spec:
                                   default: false
                                   description: In addition to binaries, match children
                                     processes of specified binaries.
+                                  type: boolean
+                                matchExecPath:
+                                  default: false
+                                  description: |-
+                                    Also match the path the process was started with, before the kernel
+                                    resolved it. Without this, values must be the resolved path of the
+                                    binary, so a policy written against a symlink never matches. Note that
+                                    this widens what the selector matches, so it should not be used to build
+                                    allow lists.
                                   type: boolean
                                 operator:
                                   description: Filter operation.
@@ -6516,6 +6606,15 @@ spec:
                                   description: In addition to binaries, match children
                                     processes of specified binaries.
                                   type: boolean
+                                matchExecPath:
+                                  default: false
+                                  description: |-
+                                    Also match the path the process was started with, before the kernel
+                                    resolved it. Without this, values must be the resolved path of the
+                                    binary, so a policy written against a symlink never matches. Note that
+                                    this widens what the selector matches, so it should not be used to build
+                                    allow lists.
+                                  type: boolean
                                 operator:
                                   description: Filter operation.
                                   enum:
@@ -6783,6 +6882,15 @@ spec:
                                   default: false
                                   description: In addition to binaries, match children
                                     processes of specified binaries.
+                                  type: boolean
+                                matchExecPath:
+                                  default: false
+                                  description: |-
+                                    Also match the path the process was started with, before the kernel
+                                    resolved it. Without this, values must be the resolved path of the
+                                    binary, so a policy written against a symlink never matches. Note that
+                                    this widens what the selector matches, so it should not be used to build
+                                    allow lists.
                                   type: boolean
                                 operator:
                                   description: Filter operation.
@@ -7573,6 +7681,15 @@ spec:
                                   description: In addition to binaries, match children
                                     processes of specified binaries.
                                   type: boolean
+                                matchExecPath:
+                                  default: false
+                                  description: |-
+                                    Also match the path the process was started with, before the kernel
+                                    resolved it. Without this, values must be the resolved path of the
+                                    binary, so a policy written against a symlink never matches. Note that
+                                    this widens what the selector matches, so it should not be used to build
+                                    allow lists.
+                                  type: boolean
                                 operator:
                                   description: Filter operation.
                                   enum:
@@ -7840,6 +7957,15 @@ spec:
                                   default: false
                                   description: In addition to binaries, match children
                                     processes of specified binaries.
+                                  type: boolean
+                                matchExecPath:
+                                  default: false
+                                  description: |-
+                                    Also match the path the process was started with, before the kernel
+                                    resolved it. Without this, values must be the resolved path of the
+                                    binary, so a policy written against a symlink never matches. Note that
+                                    this widens what the selector matches, so it should not be used to build
+                                    allow lists.
                                   type: boolean
                                 operator:
                                   description: Filter operation.

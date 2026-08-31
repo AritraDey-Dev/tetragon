@@ -680,6 +680,11 @@
                             "description": "In addition to binaries, match children processes of specified binaries.",
                             "type": "boolean"
                           },
+                          "matchExecPath": {
+                            "default": false,
+                            "description": "Also match the path the process was started with, before the kernel\nresolved it. Without this, values must be the resolved path of the\nbinary, so a policy written against a symlink never matches. Note that\nthis widens what the selector matches, so it should not be used to build\nallow lists.",
+                            "type": "boolean"
+                          },
                           "operator": {
                             "description": "Filter operation.",
                             "enum": [
@@ -1011,6 +1016,11 @@
                           "followChildren": {
                             "default": false,
                             "description": "In addition to binaries, match children processes of specified binaries.",
+                            "type": "boolean"
+                          },
+                          "matchExecPath": {
+                            "default": false,
+                            "description": "Also match the path the process was started with, before the kernel\nresolved it. Without this, values must be the resolved path of the\nbinary, so a policy written against a symlink never matches. Note that\nthis widens what the selector matches, so it should not be used to build\nallow lists.",
                             "type": "boolean"
                           },
                           "operator": {
@@ -2098,6 +2108,11 @@
                             "description": "In addition to binaries, match children processes of specified binaries.",
                             "type": "boolean"
                           },
+                          "matchExecPath": {
+                            "default": false,
+                            "description": "Also match the path the process was started with, before the kernel\nresolved it. Without this, values must be the resolved path of the\nbinary, so a policy written against a symlink never matches. Note that\nthis widens what the selector matches, so it should not be used to build\nallow lists.",
+                            "type": "boolean"
+                          },
                           "operator": {
                             "description": "Filter operation.",
                             "enum": [
@@ -2429,6 +2444,11 @@
                           "followChildren": {
                             "default": false,
                             "description": "In addition to binaries, match children processes of specified binaries.",
+                            "type": "boolean"
+                          },
+                          "matchExecPath": {
+                            "default": false,
+                            "description": "Also match the path the process was started with, before the kernel\nresolved it. Without this, values must be the resolved path of the\nbinary, so a policy written against a symlink never matches. Note that\nthis widens what the selector matches, so it should not be used to build\nallow lists.",
                             "type": "boolean"
                           },
                           "operator": {
@@ -3250,6 +3270,11 @@
                             "description": "In addition to binaries, match children processes of specified binaries.",
                             "type": "boolean"
                           },
+                          "matchExecPath": {
+                            "default": false,
+                            "description": "Also match the path the process was started with, before the kernel\nresolved it. Without this, values must be the resolved path of the\nbinary, so a policy written against a symlink never matches. Note that\nthis widens what the selector matches, so it should not be used to build\nallow lists.",
+                            "type": "boolean"
+                          },
                           "operator": {
                             "description": "Filter operation.",
                             "enum": [
@@ -3581,6 +3606,11 @@
                           "followChildren": {
                             "default": false,
                             "description": "In addition to binaries, match children processes of specified binaries.",
+                            "type": "boolean"
+                          },
+                          "matchExecPath": {
+                            "default": false,
+                            "description": "Also match the path the process was started with, before the kernel\nresolved it. Without this, values must be the resolved path of the\nbinary, so a policy written against a symlink never matches. Note that\nthis widens what the selector matches, so it should not be used to build\nallow lists.",
                             "type": "boolean"
                           },
                           "operator": {
@@ -4350,6 +4380,11 @@
                       "description": "In addition to binaries, match children processes of specified binaries.",
                       "type": "boolean"
                     },
+                    "matchExecPath": {
+                      "default": false,
+                      "description": "Also match the path the process was started with, before the kernel\nresolved it. Without this, values must be the resolved path of the\nbinary, so a policy written against a symlink never matches. Note that\nthis widens what the selector matches, so it should not be used to build\nallow lists.",
+                      "type": "boolean"
+                    },
                     "operator": {
                       "description": "Filter operation.",
                       "enum": [
@@ -4681,6 +4716,11 @@
                     "followChildren": {
                       "default": false,
                       "description": "In addition to binaries, match children processes of specified binaries.",
+                      "type": "boolean"
+                    },
+                    "matchExecPath": {
+                      "default": false,
+                      "description": "Also match the path the process was started with, before the kernel\nresolved it. Without this, values must be the resolved path of the\nbinary, so a policy written against a symlink never matches. Note that\nthis widens what the selector matches, so it should not be used to build\nallow lists.",
                       "type": "boolean"
                     },
                     "operator": {
@@ -5434,6 +5474,11 @@
                             "description": "In addition to binaries, match children processes of specified binaries.",
                             "type": "boolean"
                           },
+                          "matchExecPath": {
+                            "default": false,
+                            "description": "Also match the path the process was started with, before the kernel\nresolved it. Without this, values must be the resolved path of the\nbinary, so a policy written against a symlink never matches. Note that\nthis widens what the selector matches, so it should not be used to build\nallow lists.",
+                            "type": "boolean"
+                          },
                           "operator": {
                             "description": "Filter operation.",
                             "enum": [
@@ -5765,6 +5810,11 @@
                           "followChildren": {
                             "default": false,
                             "description": "In addition to binaries, match children processes of specified binaries.",
+                            "type": "boolean"
+                          },
+                          "matchExecPath": {
+                            "default": false,
+                            "description": "Also match the path the process was started with, before the kernel\nresolved it. Without this, values must be the resolved path of the\nbinary, so a policy written against a symlink never matches. Note that\nthis widens what the selector matches, so it should not be used to build\nallow lists.",
                             "type": "boolean"
                           },
                           "operator": {
@@ -6815,6 +6865,11 @@
                             "description": "In addition to binaries, match children processes of specified binaries.",
                             "type": "boolean"
                           },
+                          "matchExecPath": {
+                            "default": false,
+                            "description": "Also match the path the process was started with, before the kernel\nresolved it. Without this, values must be the resolved path of the\nbinary, so a policy written against a symlink never matches. Note that\nthis widens what the selector matches, so it should not be used to build\nallow lists.",
+                            "type": "boolean"
+                          },
                           "operator": {
                             "description": "Filter operation.",
                             "enum": [
@@ -7146,6 +7201,11 @@
                           "followChildren": {
                             "default": false,
                             "description": "In addition to binaries, match children processes of specified binaries.",
+                            "type": "boolean"
+                          },
+                          "matchExecPath": {
+                            "default": false,
+                            "description": "Also match the path the process was started with, before the kernel\nresolved it. Without this, values must be the resolved path of the\nbinary, so a policy written against a symlink never matches. Note that\nthis widens what the selector matches, so it should not be used to build\nallow lists.",
                             "type": "boolean"
                           },
                           "operator": {
@@ -7940,6 +8000,11 @@
                             "description": "In addition to binaries, match children processes of specified binaries.",
                             "type": "boolean"
                           },
+                          "matchExecPath": {
+                            "default": false,
+                            "description": "Also match the path the process was started with, before the kernel\nresolved it. Without this, values must be the resolved path of the\nbinary, so a policy written against a symlink never matches. Note that\nthis widens what the selector matches, so it should not be used to build\nallow lists.",
+                            "type": "boolean"
+                          },
                           "operator": {
                             "description": "Filter operation.",
                             "enum": [
@@ -8271,6 +8336,11 @@
                           "followChildren": {
                             "default": false,
                             "description": "In addition to binaries, match children processes of specified binaries.",
+                            "type": "boolean"
+                          },
+                          "matchExecPath": {
+                            "default": false,
+                            "description": "Also match the path the process was started with, before the kernel\nresolved it. Without this, values must be the resolved path of the\nbinary, so a policy written against a symlink never matches. Note that\nthis widens what the selector matches, so it should not be used to build\nallow lists.",
                             "type": "boolean"
                           },
                           "operator": {

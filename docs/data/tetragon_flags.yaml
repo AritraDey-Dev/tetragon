@@ -115,6 +115,10 @@ options:
     - name: event-queue-size
       default_value: "10000"
       usage: Set the size of the internal event queue.
+    - name: exec-path-map-enabled
+      default_value: "false"
+      usage: |
+        Enable exec_path map for the matchExecPath option of matchBinaries selectors
     - name: execve-map-entries
       default_value: "0"
       usage: Set entries for execve_map table (default 32768)
