@@ -301,6 +301,28 @@ execve_rate_check(void *ctx, struct msg_execve_event *msg)
  * execve event that has already been collected, then send it to the perf
  * buffer.
  */
+#ifdef __LARGE_BPF_PROG
+/* update_exec_path stores the unresolved execve() path for pid in tg_exec_path. */
+FUNC_INLINE void
+update_exec_path(struct bpf_raw_tracepoint_args *ctx, __u32 pid)
+{
+	struct linux_binprm *bprm = (struct linux_binprm *)ctx->args[2];
+	struct exec_path *ep;
+	char *filename;
+	__u32 zero = 0;
+
+	ep = map_lookup_elem(&tg_exec_path_heap, &zero);
+	if (!ep)
+		return;
+
+	probe_read(&filename, sizeof(filename), _(&bprm->filename));
+	if (probe_read_str(ep->path, sizeof(ep->path), (void *)filename) <= 0)
+		return;
+
+	map_update_elem(&tg_exec_path, &pid, ep, BPF_ANY);
+}
+#endif /* __LARGE_BPF_PROG */
+
 FUNC_LOCAL int
 execve_send_event(struct bpf_raw_tracepoint_args *ctx,
 		  struct msg_execve_event *event)
@@ -369,6 +391,13 @@ execve_send_event(struct bpf_raw_tracepoint_args *ctx,
 
 		// read from proc exe stored at execve time
 		copy_exe_to_bin(&event->exe, &curr->bin);
+
+		// Record the path as it was handed to execve() as well. The path
+		// copied above was resolved by the kernel, so it no longer carries
+		// the symlink the process was started through. matchBinaries
+		// selectors opt into matching this one with matchExecPath.
+		if (CONFIG(EXEC_PATH_MAP_ENABLED))
+			update_exec_path(ctx, p->pid);
 
 		off = event->exe.arg_start;
 		if (event->exe.arg_len > sizeof(curr->bin.args) - 2)

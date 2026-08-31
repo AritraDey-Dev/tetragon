@@ -378,6 +378,30 @@ struct {
 	__type(value, struct binary);
 } tg_parents_bin SEC(".maps");
 
+// Exec path map holds the path as it was handed to execve(). Unlike
+// ->bin.path, which the kernel resolved from task->mm->exe_file, this is not
+// resolved, so it still carries the symlink or relative path the process was
+// started with. It is only populated when the agent runs with
+// --exec-path-map-enabled, and is read by matchBinaries selectors that set
+// matchExecPath.
+struct exec_path {
+	char path[BINARY_PATH_MAX_LEN];
+};
+
+struct {
+	__uint(type, BPF_MAP_TYPE_LRU_HASH);
+	__uint(max_entries, 1);
+	__type(key, __u32);
+	__type(value, struct exec_path);
+} tg_exec_path SEC(".maps");
+
+struct {
+	__uint(type, BPF_MAP_TYPE_PERCPU_ARRAY);
+	__uint(max_entries, 1);
+	__type(key, __u32);
+	__type(value, struct exec_path);
+} tg_exec_path_heap SEC(".maps");
+
 struct {
 	__uint(type, BPF_MAP_TYPE_HASH);
 	__uint(max_entries, 1);

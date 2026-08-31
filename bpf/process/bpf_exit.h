@@ -74,6 +74,7 @@ FUNC_INLINE void event_exit_send(void *ctx, __u32 tgid)
 	}
 	execve_map_delete(tgid);
 	map_delete_elem(&tg_parents_bin, &enter->key.pid);
+	map_delete_elem(&tg_exec_path, &enter->key.pid);
 }
 
 #endif /* __EXIT_H__ */

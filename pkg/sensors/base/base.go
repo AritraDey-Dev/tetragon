@@ -10,6 +10,7 @@ import (
 	"testing"
 	"unsafe"
 
+	"github.com/cilium/tetragon/pkg/api/processapi"
 	"github.com/cilium/tetragon/pkg/config"
 	"github.com/cilium/tetragon/pkg/errmetrics"
 	"github.com/cilium/tetragon/pkg/execvemapupdater"
@@ -80,6 +81,8 @@ var (
 	ExecveJoinMap = program.MapBuilder("tg_execve_joined_info_map", ExecveBprmCommit)
 
 	ParentBinariesMap = program.MapBuilder("tg_parents_bin", Execve, Exit)
+
+	ExecPathMap = program.MapBuilder("tg_exec_path", Execve, Exit)
 
 	/* Tetragon runtime configuration */
 	TetragonConfMap = program.MapBuilder("tg_conf_map", Execve)
@@ -163,11 +166,22 @@ func setupSensor() {
 		Execve.RewriteConstants["PARENTS_MAP_ENABLED"] = uint8(1)
 	}
 
+	if !config.EnableV511Progs() && option.Config.ExecPathMapEnabled {
+		Execve.RewriteConstants["EXEC_PATH_MAP_ENABLED"] = uint8(1)
+	}
+
 	if option.Config.ParentsMapEnabled {
 		entries = GetExecveEntries(option.Config.ParentsMapEntries, option.Config.ParentsMapSize)
 		ParentBinariesMap.SetMaxEntries(entries)
 		logger.GetLogger().Info(fmt.Sprintf("Set parents_map entries %d", entries),
 			"size", strutils.SizeWithSuffix(entries*int(unsafe.Sizeof(execvemap.ExecveValue{}))))
+	}
+
+	if option.Config.ExecPathMapEnabled {
+		entries = GetExecveEntries(option.Config.ExecveMapEntries, option.Config.ExecveMapSize)
+		ExecPathMap.SetMaxEntries(entries)
+		logger.GetLogger().Info(fmt.Sprintf("Set exec_path map entries %d", entries),
+			"size", strutils.SizeWithSuffix(entries*processapi.BINARY_PATH_MAX_LEN))
 	}
 }
 

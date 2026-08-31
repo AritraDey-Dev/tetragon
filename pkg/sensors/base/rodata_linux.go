@@ -16,11 +16,12 @@ const (
 )
 
 type rodataConfig struct {
-	IterNum           uint8
-	UsePerfRingBuf    uint8
-	EnvVarsEnabled    uint8
-	ParentsMapEnabled uint8
-	Pad               [4]uint8
+	IterNum            uint8
+	UsePerfRingBuf     uint8
+	EnvVarsEnabled     uint8
+	ParentsMapEnabled  uint8
+	ExecPathMapEnabled uint8
+	Pad                [3]uint8
 }
 
 func b2u8(b bool) uint8 {
@@ -45,11 +46,15 @@ func rodataCurrent() rodataConfig {
 	// parents match enabled by --parents-map-enabled option
 	parentsMapEnabled := b2u8(option.Config.ParentsMapEnabled)
 
+	// exec path recording enabled by --exec-path-map-enabled option
+	execPathMapEnabled := b2u8(option.Config.ExecPathMapEnabled)
+
 	return rodataConfig{
-		IterNum:           iterNum,
-		UsePerfRingBuf:    usePerfRingBuf,
-		EnvVarsEnabled:    envVarsEnabled,
-		ParentsMapEnabled: parentsMapEnabled,
+		IterNum:            iterNum,
+		UsePerfRingBuf:     usePerfRingBuf,
+		EnvVarsEnabled:     envVarsEnabled,
+		ParentsMapEnabled:  parentsMapEnabled,
+		ExecPathMapEnabled: execPathMapEnabled,
 	}
 }
 
