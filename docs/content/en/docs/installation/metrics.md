@@ -10,10 +10,19 @@ Tetragon exposes a number of Prometheus metrics that can be used for two main pu
 1. Monitoring the health of Tetragon itself
 2. Monitoring the activity of processes observed by Tetragon
 
+The two are served on separate paths of the metrics server:
+
+| path | metrics | enabled by default |
+| ---- | ------- | ------------------ |
+| `/metrics` | health and resource metrics | yes |
+| `/metrics/events` | per-event metrics | no |
+
 {{< note >}}
-  When the metrics server is started, Tetragon exposes both health and event
-  metrics by default. You can disable event metrics while keeping health metrics
-  by passing the `--enable-event-metrics=false` flag.
+  Event metrics are disabled by default, because they carry per-workload labels
+  and so their cardinality grows with what runs on the node. Enable them with the
+  `--enable-event-metrics` flag, or with the `tetragon.prometheus.eventMetrics.enabled`
+  Helm value, which also adds them to the `ServiceMonitor`. Health metrics on
+  `/metrics` are unaffected either way.
 {{< /note >}}
 
 For the full list, refer to [metrics reference]({{< ref "/docs/reference/metrics" >}}).

@@ -7,7 +7,17 @@ Depending on your setup, changes listed here might require a manual intervention
 
 ### Agent Options
 
-* TBD
+* Per-event metrics moved from `/metrics` to `/metrics/events` on the same
+  metrics port. Prometheus setups that scrape `/metrics` directly need a second
+  scrape target for the new path. The Helm chart does this for you when
+  `tetragon.prometheus.eventMetrics.enabled` is set.
+* `--enable-event-metrics` now defaults to `false`. Per-event metrics
+  (`tetragon_events_total`, `tetragon_policy_events_total` and
+  `tetragon_syscalls_total`) are no longer exposed unless the flag is set
+  explicitly. They are labelled per workload, so their cardinality grows with
+  what runs on the node, which makes them a poor default. Health and resource
+  metrics are unaffected. Set `--enable-event-metrics` to restore the previous
+  behaviour.
 
 ### Helm Values
 
