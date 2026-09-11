@@ -602,7 +602,7 @@ The total number of Tetragon events
 | label | values |
 | ----- | ------ |
 | `binary` | `example-binary` |
-| `event_type` | `PROCESS_EXEC, PROCESS_EXIT, PROCESS_KPROBE, PROCESS_LOADER, PROCESS_LSM, PROCESS_THROTTLE, PROCESS_TRACEPOINT, PROCESS_UPROBE, PROCESS_USDT, RATE_LIMIT_INFO` |
+| `event_type` | `PROCESS_EXEC, PROCESS_EXIT, PROCESS_KPROBE, PROCESS_LOADER, PROCESS_LSM, PROCESS_THROTTLE, PROCESS_TRACEPOINT, PROCESS_UPROBE, PROCESS_USDT, RATE_LIMIT_INFO, unknown` |
 | `namespace` | `example-namespace` |
 | `node_name` | `example-node-name` |
 | `pod  ` | `example-pod` |
