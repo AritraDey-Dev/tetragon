@@ -31,7 +31,7 @@ func initMetrics(target string, reg *prometheus.Registry, _ *slog.Logger) error 
 	case "resources":
 		metricsconfig.InitResourcesMetricsForDocs(reg)
 	case "events":
-		metricsconfig.InitEventsMetricsForDocs(reg)
+		metricsconfig.EnableEventsMetrics(reg).InitForDocs()
 	}
 	return nil
 }

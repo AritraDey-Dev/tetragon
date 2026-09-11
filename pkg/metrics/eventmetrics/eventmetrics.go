@@ -7,8 +7,6 @@ import (
 	"maps"
 	"slices"
 
-	"github.com/prometheus/client_golang/prometheus"
-
 	"github.com/cilium/tetragon/api/v1/tetragon"
 	"github.com/cilium/tetragon/api/v1/tetragon/codegen/helpers"
 	"github.com/cilium/tetragon/pkg/api/processapi"
@@ -111,22 +109,11 @@ func InitHealthMetrics() {
 	}
 }
 
-func InitEventsMetrics(registry *prometheus.Registry) {
-	registry.MustRegister(EventsProcessed)
-	registry.MustRegister(policyStats)
-}
-
-func InitEventsMetricsForDocs(registry *prometheus.Registry) {
-	InitEventsMetrics(registry)
-
-	// Initialize metrics with example labels
-	processLabels := option.CreateProcessLabels(consts.ExampleNamespace, consts.ExampleWorkload, consts.ExamplePod, consts.ExampleBinary, consts.ExampleNodeName)
-	for ev, evString := range tetragon.EventType_name {
-		if tetragon.EventType(ev) != tetragon.EventType_UNDEF && tetragon.EventType(ev) != tetragon.EventType_TEST {
-			EventsProcessed.WithLabelValues(processLabels, evString).Add(0)
-		}
-	}
-	policyStats.WithLabelValues(processLabels, consts.ExamplePolicyLabel, consts.ExampleKprobeLabel).Add(0)
+func RegisterEventsMetrics(group metrics.Group) {
+	group.MustRegister(
+		EventsProcessed,
+		policyStats,
+	)
 }
 
 func GetProcessInfo(process *tetragon.Process) (binary, pod, workload, namespace string) {
