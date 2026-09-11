@@ -164,6 +164,7 @@ To use [the values available](#values), with `helm install` or `helm upgrade`, u
 | tetragon.processCacheSize | int | `65536` | Tetragon puts processes in an LRU cache. The cache is used to find ancestors for subsequently exec'ed processes. |
 | tetragon.prometheus.address | string | `""` | The address at which to expose metrics. Set it to "" to expose on all available interfaces. |
 | tetragon.prometheus.enabled | bool | `true` | Whether to enable exposing Tetragon metrics. |
+| tetragon.prometheus.eventMetrics | object | `{"enabled":false}` | Whether to expose per-event metrics. They are labelled per workload, so their cardinality grows with what runs on the node. When enabled they are served on /metrics/events, separately from health metrics on /metrics. |
 | tetragon.prometheus.metricsLabelFilter | string | `"namespace,workload,pod,binary"` | Comma-separated list of enabled metrics labels. The configurable labels are: namespace, workload, pod, binary. Unknown labels will be ignored. Removing some labels from the list might help reduce the metrics cardinality if needed. |
 | tetragon.prometheus.port | int | `2112` | The port at which to expose metrics. |
 | tetragon.prometheus.serviceMonitor.enabled | bool | `false` | Whether to create a 'ServiceMonitor' resource targeting the tetragon pods. |
