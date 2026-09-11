@@ -187,6 +187,11 @@ tetragon:
     # The configurable labels are: namespace, workload, pod, binary. Unknown labels will be ignored.
     # Removing some labels from the list might help reduce the metrics cardinality if needed.
     metricsLabelFilter: "namespace,workload,pod,binary"
+    # -- Whether to expose per-event metrics. They are labelled per workload, so
+    # their cardinality grows with what runs on the node. When enabled they are
+    # served on /metrics/events, separately from health metrics on /metrics.
+    eventMetrics:
+      enabled: false
     serviceMonitor:
       # -- Whether to create a 'ServiceMonitor' resource targeting the tetragon pods.
       enabled: false

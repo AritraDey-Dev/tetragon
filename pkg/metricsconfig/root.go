@@ -17,9 +17,17 @@ import (
 	"github.com/cilium/tetragon/pkg/logger/logfields"
 )
 
+// EventsMetricsPath is where the events metrics group is served. Health and
+// resource metrics stay on /metrics, so the two can be scraped, relabelled and
+// retained independently.
+const EventsMetricsPath = "/metrics/events"
+
 var (
 	registry     *prometheus.Registry
 	registryOnce sync.Once
+
+	eventsRegistry     *prometheus.Registry
+	eventsRegistryOnce sync.Once
 )
 
 func GetRegistry() *prometheus.Registry {
@@ -29,15 +37,31 @@ func GetRegistry() *prometheus.Registry {
 	return registry
 }
 
+// GetEventsRegistry returns the registry backing EventsMetricsPath. It is
+// separate from the root registry so that events metrics, whose cardinality
+// depends on the workloads running on the node, are not mixed into the health
+// metrics scrape.
+func GetEventsRegistry() *prometheus.Registry {
+	eventsRegistryOnce.Do(func() {
+		eventsRegistry = prometheus.NewRegistry()
+	})
+	return eventsRegistry
+}
+
 // newMetricsServer builds the metrics server and binds its listener. Binding is
 // separate from serving so that callers observe bind errors synchronously, and
 // so tests can learn the address that was actually bound (e.g. when asking for
 // port 0).
 func newMetricsServer(address string) (*http.Server, net.Listener, error) {
 	reg := GetRegistry()
+	eventsReg := GetEventsRegistry()
 
 	mux := http.NewServeMux()
 	mux.Handle("/metrics", promhttp.HandlerFor(reg, promhttp.HandlerOpts{Registry: reg}))
+	// Registered unconditionally: the server starts before metrics are
+	// initialized, and the endpoint simply returns nothing while the events
+	// group is not enabled.
+	mux.Handle(EventsMetricsPath, promhttp.HandlerFor(eventsReg, promhttp.HandlerOpts{Registry: eventsReg}))
 
 	listener, err := net.Listen("tcp", address)
 	if err != nil {

@@ -31,6 +31,23 @@ spec:
           sourceLabels:
             - __meta_kubernetes_pod_name
           targetLabel: tetragon_pod
+    {{- if .Values.tetragon.prometheus.eventMetrics.enabled }}
+    - honorLabels: true
+      interval: {{ .Values.tetragon.prometheus.serviceMonitor.scrapeInterval }}
+      path: /metrics/events
+      port: metrics
+      relabelings:
+        - action: replace
+          replacement: ${1}
+          sourceLabels:
+            - __meta_kubernetes_pod_node_name
+          targetLabel: node
+        - action: replace
+          replacement: ${1}
+          sourceLabels:
+            - __meta_kubernetes_pod_name
+          targetLabel: tetragon_pod
+    {{- end }}
   namespaceSelector:
     matchNames:
       - {{ .Release.Namespace }}

@@ -50,6 +50,7 @@ data:
 {{- end }}
 {{- if .Values.tetragon.prometheus.enabled }}
   metrics-label-filter: {{ .Values.tetragon.prometheus.metricsLabelFilter }}
+  enable-event-metrics: {{ .Values.tetragon.prometheus.eventMetrics.enabled | quote }}
 {{- end }}
 {{- if .Values.tetragon.grpc.enabled }}
   server-address: {{ .Values.tetragon.grpc.address }}

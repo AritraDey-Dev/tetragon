@@ -508,7 +508,7 @@ func tetragonExecuteCtx(ctx context.Context, cancel context.CancelFunc, ready fu
 		metricsconfig.InitHealthMetrics(reg)
 
 		if option.Config.EnableEventMetrics {
-			metricsconfig.InitEventsMetrics(reg)
+			metricsconfig.InitEventsMetrics(metricsconfig.GetEventsRegistry())
 		}
 
 		initK8sMetrics()

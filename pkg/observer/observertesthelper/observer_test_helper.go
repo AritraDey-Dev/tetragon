@@ -254,7 +254,7 @@ func getDefaultObserver(tb testing.TB, ctx context.Context, initialSensor *senso
 			return
 		}
 		metricsconfig.InitHealthMetrics(metricsconfig.GetRegistry())
-		metricsconfig.InitEventsMetrics(metricsconfig.GetRegistry())
+		metricsconfig.InitEventsMetrics(metricsconfig.GetEventsRegistry())
 	})
 
 	tb.Cleanup(func() {

@@ -93,3 +93,54 @@ func TestMetricsServer(t *testing.T) {
 		require.Error(t, err, "metrics server still serving after stop returned")
 	})
 }
+
+// TestEventsMetricsEndpoint checks that events metrics are served on their own
+// path and, crucially, that the two endpoints do not leak into each other. A
+// single shared registry would still pass a naive "endpoint responds" check,
+// so both directions are asserted.
+func TestEventsMetricsEndpoint(t *testing.T) {
+	health := prometheus.NewCounter(prometheus.CounterOpts{
+		Name: "tetragon_metricsconfig_test_health_total",
+		Help: "Test-only counter registered in the root registry.",
+	})
+	GetRegistry().MustRegister(health)
+	t.Cleanup(func() { GetRegistry().Unregister(health) })
+	health.Inc()
+
+	events := prometheus.NewCounter(prometheus.CounterOpts{
+		Name: "tetragon_metricsconfig_test_events_total",
+		Help: "Test-only counter registered in the events registry.",
+	})
+	GetEventsRegistry().MustRegister(events)
+	t.Cleanup(func() { GetEventsRegistry().Unregister(events) })
+	events.Inc()
+
+	server, listener, err := newMetricsServer("127.0.0.1:0")
+	require.NoError(t, err)
+	stop := serve(server, listener)
+	t.Cleanup(stop)
+
+	client := newTestClient()
+	get := func(t *testing.T, path string) string {
+		t.Helper()
+		resp, err := client.Get("http://" + listener.Addr().String() + path)
+		require.NoError(t, err)
+		t.Cleanup(func() { resp.Body.Close() })
+		require.Equal(t, http.StatusOK, resp.StatusCode)
+		body, err := io.ReadAll(resp.Body)
+		require.NoError(t, err)
+		return string(body)
+	}
+
+	t.Run("events path serves the events registry", func(t *testing.T) {
+		body := get(t, EventsMetricsPath)
+		require.Contains(t, body, "tetragon_metricsconfig_test_events_total 1")
+		require.NotContains(t, body, "tetragon_metricsconfig_test_health_total")
+	})
+
+	t.Run("health path does not serve events metrics", func(t *testing.T) {
+		body := get(t, "/metrics")
+		require.Contains(t, body, "tetragon_metricsconfig_test_health_total 1")
+		require.NotContains(t, body, "tetragon_metricsconfig_test_events_total")
+	})
+}

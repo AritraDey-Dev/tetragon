@@ -39,6 +39,7 @@ func TestMetricsWithPod(t *testing.T) {
 	healthMetrics := []string{"tetragon_build_info", "tetragon_data_events_total"}
 
 	reg := metricsconfig.GetRegistry()
+	eventsReg := metricsconfig.GetEventsRegistry()
 
 	// Only health metrics should be present
 	// * tetragon_build_info
@@ -53,7 +54,8 @@ func TestMetricsWithPod(t *testing.T) {
 			require.NotNil(t, metricSeries[metric])
 		}
 
-		// Event metrics should be nil, even though the pod was deleted
+		// Event metrics are served from a separate registry, so they must not
+		// show up in the health scrape whether or not they are enabled.
 		for _, metric := range eventMetrics {
 			require.Nil(t, metricSeries[metric])
 		}
@@ -66,10 +68,10 @@ func TestMetricsWithPod(t *testing.T) {
 	// * tetragon_policy_events_total
 	// * tetragon_syscalls_total
 	t.Run("TestPodDeleteHealthAndEventMetrics", func(t *testing.T) {
-		metricsconfig.InitEventsMetrics(reg)
+		metricsconfig.InitEventsMetrics(eventsReg)
 
 		deletePod()
-		metricSeries := getMetricSeries(t, reg)
+		metricSeries := getMetricSeries(t, eventsReg)
 		checkMetricSeriesCount(t, metricSeries, eventMetrics, 4)
 
 		// Exactly one timeseries should be deleted for each metric (matching both
@@ -79,7 +81,7 @@ func TestMetricsWithPod(t *testing.T) {
 			Namespace: "fake-namespace",
 		})
 
-		metricSeries = getMetricSeries(t, reg)
+		metricSeries = getMetricSeries(t, eventsReg)
 		checkMetricSeriesCount(t, metricSeries, eventMetrics, 3)
 	})
 }
