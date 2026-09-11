@@ -66,9 +66,9 @@ options:
       default_value: "false"
       usage: Enable deprecated gRPC TracingPolicy APIs
     - name: enable-event-metrics
-      default_value: "true"
+      default_value: "false"
       usage: |
-        Enable per-event metrics. Enabled by default. Health and resource metrics are always available when --metrics-server is set.
+        Enable per-event metrics. Disabled by default, as their cardinality grows with the workloads running on the node. Health and resource metrics are always available when --metrics-server is set.
     - name: enable-export-aggregation
       default_value: "false"
       usage: Enable JSON export aggregation
