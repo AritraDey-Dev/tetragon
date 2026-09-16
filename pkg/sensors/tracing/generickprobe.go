@@ -852,7 +852,8 @@ func addKprobe(funcName string, instance InstanceID, f *v1alpha1.KProbeSpec, in 
 	}
 
 	// Parse Data
-	for _, data := range f.Data {
+	for _, d := range f.Data {
+		data := d.KProbeArg()
 		if !hasCurrentTaskSource(&data) && !hasPtRegsSource(&data) {
 			return errFn(fmt.Errorf("data argument has wrong source '%s'", data.Source))
 		}
@@ -944,7 +945,7 @@ func addKprobe(funcName string, instance InstanceID, f *v1alpha1.KProbeSpec, in 
 	kprobeEntry.loadArgs.selectors.entry, err = selectors.InitKernelSelectorState(&selectors.KernelSelectorArgs{
 		Selectors:      f.Selectors,
 		Args:           f.Args,
-		Data:           f.Data,
+		Data:           v1alpha1.KProbeArgs(f.Data),
 		ActionArgTable: &kprobeEntry.actionArgs,
 		Maps:           in.selMaps,
 		CelExprs:       in.celExprs,

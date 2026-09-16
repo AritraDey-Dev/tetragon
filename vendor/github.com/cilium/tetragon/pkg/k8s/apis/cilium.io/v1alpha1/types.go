@@ -50,7 +50,7 @@ type KProbeSpec struct {
 	Args []KProbeArg `json:"args,omitempty"`
 	// +kubebuilder:validation:Optional
 	// A list of data to include in the trace output.
-	Data []KProbeArg `json:"data,omitempty"`
+	Data []KProbeData `json:"data,omitempty"`
 	// +kubebuilder:validation:Optional
 	// A return argument to include in the trace output.
 	ReturnArg *KProbeArg `json:"returnArg,omitempty"`
@@ -119,6 +119,93 @@ type KProbeArg struct {
 	// Kernel module that contains the BTFType. This is used only for kprobe args.
 	// The module must already be loaded and expose BTF in /sys/kernel/btf.
 	BTFTypeModule string `json:"btfTypeModule,omitempty"`
+}
+
+// KProbeData describes a piece of data to include in the trace output that is
+// read from somewhere other than the traced function's arguments, as set by
+// Source (for example the current task).
+//
+// It carries the same fields as KProbeArg, except that Index is optional:
+// data is not read from a function argument, so there is no argument position
+// to point at. The field is still accepted, and ignored, so that policies
+// written before it became optional keep working.
+type KProbeData struct {
+	// +kubebuilder:validation:Optional
+	// +kubebuilder:validation:Minimum=0
+	// Unused for data and ignored. Accepted for backwards compatibility.
+	Index uint32 `json:"index,omitempty"`
+	// +kubebuilder:validation:Enum=auto;int;sint8;int8;uint8;sint16;int16;uint16;uint32;sint32;int32;ulong;uint64;size_t;long;sint64;int64;char_buf;char_iovec;skb;sock;sockaddr;socket;sockaddr_un;string;fd;file;filename;path;nop;bpf_attr;perf_event;bpf_map;user_namespace;capability;kiocb;iov_iter;cred;const_buf;load_info;module;syscall64;kernel_cap_t;cap_inheritable;cap_permitted;cap_effective;linux_binprm;data_loc;net_device;bpf_cmd;dentry;bpf_prog;
+	// +kubebuilder:default=auto
+	// Data type.
+	Type string `json:"type"`
+	// +kubebuilder:validation:Optional
+	// +kubebuilder:default=""
+	// Resolve the path to a specific attribute
+	Resolve string `json:"resolve"`
+	// +kubebuilder:validation:Optional
+	// +kubebuilder:validation:Minimum=0
+	// Specifies the position of the corresponding size argument for this data.
+	// This field is used only for char_buf and char_iovec types.
+	SizeArgIndex uint32 `json:"sizeArgIndex"`
+	// +kubebuilder:validation:Optional
+	// +kubebuilder:default=false
+	// This field is used only for char_buf and char_iovec types. It indicates
+	// that this data should be read later (when the kretprobe for the
+	// symbol is triggered) because it might not be populated when the kprobe
+	// is triggered at the entrance of the function.
+	ReturnCopy bool `json:"returnCopy"`
+	// +kubebuilder:validation:Optional
+	// +kubebuilder:default=false
+	// Read maximum possible data (currently 327360). This field is only used
+	// for char_buff data. When this value is false (default), the bpf program
+	// will fetch at most 4096 bytes. In later kernels (>=5.4) tetragon
+	// supports fetching up to 327360 bytes if this flag is turned on
+	MaxData bool `json:"maxData"`
+	// +kubebuilder:validation:Optional
+	// Label to output in the JSON
+	Label string `json:"label"`
+	// +kubebuilder:validation:Optional
+	// Source of the data, if missing the default if function arguments
+	Source string `json:"source"`
+	// +kubebuilder:validation:Optional
+	// Type to use as the initial resolve type. For kprobe data it looks up the named struct
+	// from the kernel BTF, casting the value's type before traversing the resolve path.
+	// For UprobeSpecs and UsdtSpecs it looks up the type from the BTF file defined by BTFPath.
+	BTFType string `json:"btfType,omitempty"`
+	// +kubebuilder:validation:Optional
+	// Kernel module that contains the BTFType. This is used only for kprobe data.
+	// The module must already be loaded and expose BTF in /sys/kernel/btf.
+	BTFTypeModule string `json:"btfTypeModule,omitempty"`
+}
+
+// KProbeArg returns d in the KProbeArg form used by the code paths shared
+// between arguments and data.
+func (d KProbeData) KProbeArg() KProbeArg {
+	return KProbeArg{
+		Index:         d.Index,
+		Type:          d.Type,
+		Resolve:       d.Resolve,
+		SizeArgIndex:  d.SizeArgIndex,
+		ReturnCopy:    d.ReturnCopy,
+		MaxData:       d.MaxData,
+		Label:         d.Label,
+		Source:        d.Source,
+		BTFType:       d.BTFType,
+		BTFTypeModule: d.BTFTypeModule,
+	}
+}
+
+// KProbeArgs returns data in the KProbeArg form used by the code paths shared
+// between arguments and data.
+func KProbeArgs(data []KProbeData) []KProbeArg {
+	if data == nil {
+		return nil
+	}
+	args := make([]KProbeArg, 0, len(data))
+	for _, d := range data {
+		args = append(args, d.KProbeArg())
+	}
+	return args
 }
 
 type BinarySelector struct {
@@ -489,7 +576,7 @@ type UProbeSpec struct {
 	Args []KProbeArg `json:"args,omitempty"`
 	// +kubebuilder:validation:Optional
 	// A list of data to include in the trace output.
-	Data []KProbeArg `json:"data,omitempty"`
+	Data []KProbeData `json:"data,omitempty"`
 	// +kubebuilder:validation:optional
 	// +kubebuilder:validation:MaxItems=16
 	// Tags to categorize the event, will be include in the event output.

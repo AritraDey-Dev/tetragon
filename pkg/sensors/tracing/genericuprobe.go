@@ -708,7 +708,7 @@ func initUprobeSelectors(spec *v1alpha1.UProbeSpec, in *addUprobeIn, state *upro
 	entry, err := selectors.InitKernelSelectorState(&selectors.KernelSelectorArgs{
 		Selectors:             spec.Selectors,
 		Args:                  spec.Args,
-		Data:                  spec.Data,
+		Data:                  v1alpha1.KProbeArgs(spec.Data),
 		IsUprobe:              true,
 		UprobeID:              nextIdx,
 		OverrideActionIPDelta: ipDelta,
@@ -1207,7 +1207,8 @@ func getUprobeArgConfig(spec *v1alpha1.UProbeSpec, has *uprobeHas) (uprobeArgCon
 	}
 
 	// Parse Data
-	for _, data := range spec.Data {
+	for _, d := range spec.Data {
+		data := d.KProbeArg()
 		if !hasPtRegsSource(&data) && !hasCurrentTaskSource(&data) {
 			return cfg, fmt.Errorf("data argument has wrong source '%s'", data.Source)
 		}
