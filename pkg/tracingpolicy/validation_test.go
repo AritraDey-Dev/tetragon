@@ -4,6 +4,9 @@
 package tracingpolicy
 
 import (
+	"reflect"
+	"sort"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -194,4 +197,83 @@ spec:
         - value
 `)
 	require.Error(t, err)
+}
+
+// kprobe data is read from somewhere other than the traced function's
+// arguments, so there is no argument position to point at. Requiring an index
+// on it forced everyone to write a meaningless "index: 0".
+func TestKprobeDataIndexOptional(t *testing.T) {
+	policy := func(indexLine string) string {
+		return `
+apiVersion: cilium.io/v1alpha1
+kind: TracingPolicy
+metadata:
+  name: "auid-filter"
+spec:
+  kprobes:
+  - call: "sys_setuid"
+    syscall: true
+    args:
+    - index: 0
+      type: int
+    data:
+    - type: uint32
+` + indexLine + `      source: current_task
+      resolve: "loginuid.val"
+    selectors:
+    - matchData:
+      - args: [0]
+        operator: "NotEqual"
+        values: ["1000"]
+`
+	}
+
+	t.Run("without index", func(t *testing.T) {
+		_, err := FromYAML(policy(""))
+		require.NoError(t, err)
+	})
+
+	// Policies written while index was required must keep working.
+	t.Run("with index, for backwards compatibility", func(t *testing.T) {
+		_, err := FromYAML(policy("      index: 0\n"))
+		require.NoError(t, err)
+	})
+
+	// Arguments still need one: index 0 is a perfectly plausible argument
+	// position, so silently defaulting there would trace the wrong argument.
+	t.Run("args still require an index", func(t *testing.T) {
+		_, err := FromYAML(`
+apiVersion: cilium.io/v1alpha1
+kind: TracingPolicy
+metadata:
+  name: "arg-without-index"
+spec:
+  kprobes:
+  - call: "sys_setuid"
+    syscall: true
+    args:
+    - type: int
+`)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "index in body is required")
+	})
+}
+
+// KProbeData duplicates KProbeArg's fields so that index can be optional on
+// one and required on the other. Catch the two drifting apart.
+func TestKprobeDataMatchesKprobeArgFields(t *testing.T) {
+	jsonFields := func(typ reflect.Type) []string {
+		var out []string
+		for i := range typ.NumField() {
+			tag, _, _ := strings.Cut(typ.Field(i).Tag.Get("json"), ",")
+			out = append(out, tag)
+		}
+		sort.Strings(out)
+		return out
+	}
+
+	arg := jsonFields(reflect.TypeOf(v1alpha1.KProbeArg{}))
+	data := jsonFields(reflect.TypeOf(v1alpha1.KProbeData{}))
+	require.Equal(t, arg, data,
+		"KProbeArg and KProbeData must carry the same fields; update KProbeData and its KProbeArg method")
 }
