@@ -217,17 +217,18 @@
               "data": {
                 "description": "A list of data to include in the trace output.",
                 "items": {
+                  "description": "KProbeData describes a piece of data to include in the trace output that is\nread from somewhere other than the traced function's arguments, as set by\nSource (for example the current task).\n\nIt carries the same fields as KProbeArg, except that Index is optional:\ndata is not read from a function argument, so there is no argument position\nto point at. The field is still accepted, and ignored, so that policies\nwritten before it became optional keep working.",
                   "properties": {
                     "btfType": {
-                      "description": "Type to use as the initial resolve type. For kprobe args it looks up the named struct\nfrom the kernel BTF, casting the argument's type before traversing the resolve path.\nFor UprobeSpecs and UsdtSpecs it looks up the type from the BTF file defined by BTFPath.",
+                      "description": "Type to use as the initial resolve type. For kprobe data it looks up the named struct\nfrom the kernel BTF, casting the value's type before traversing the resolve path.\nFor UprobeSpecs and UsdtSpecs it looks up the type from the BTF file defined by BTFPath.",
                       "type": "string"
                     },
                     "btfTypeModule": {
-                      "description": "Kernel module that contains the BTFType. This is used only for kprobe args.\nThe module must already be loaded and expose BTF in /sys/kernel/btf.",
+                      "description": "Kernel module that contains the BTFType. This is used only for kprobe data.\nThe module must already be loaded and expose BTF in /sys/kernel/btf.",
                       "type": "string"
                     },
                     "index": {
-                      "description": "Position of the argument.",
+                      "description": "Unused for data and ignored. Accepted for backwards compatibility.",
                       "format": "int32",
                       "minimum": 0,
                       "type": "integer"
@@ -248,11 +249,11 @@
                     },
                     "returnCopy": {
                       "default": false,
-                      "description": "This field is used only for char_buf and char_iovec types. It indicates\nthat this argument should be read later (when the kretprobe for the\nsymbol is triggered) because it might not be populated when the kprobe\nis triggered at the entrance of the function. For example, a buffer\nsupplied to read(2) won't have content until kretprobe is triggered.",
+                      "description": "This field is used only for char_buf and char_iovec types. It indicates\nthat this data should be read later (when the kretprobe for the\nsymbol is triggered) because it might not be populated when the kprobe\nis triggered at the entrance of the function.",
                       "type": "boolean"
                     },
                     "sizeArgIndex": {
-                      "description": "Specifies the position of the corresponding size argument for this argument.\nThis field is used only for char_buf and char_iovec types.",
+                      "description": "Specifies the position of the corresponding size argument for this data.\nThis field is used only for char_buf and char_iovec types.",
                       "format": "int32",
                       "minimum": 0,
                       "type": "integer"
@@ -263,7 +264,7 @@
                     },
                     "type": {
                       "default": "auto",
-                      "description": "Argument type.",
+                      "description": "Data type.",
                       "enum": [
                         "auto",
                         "int",
@@ -322,7 +323,6 @@
                     }
                   },
                   "required": [
-                    "index",
                     "type"
                   ],
                   "type": "object",
@@ -1713,17 +1713,18 @@
               "data": {
                 "description": "A list of data to include in the trace output.",
                 "items": {
+                  "description": "KProbeData describes a piece of data to include in the trace output that is\nread from somewhere other than the traced function's arguments, as set by\nSource (for example the current task).\n\nIt carries the same fields as KProbeArg, except that Index is optional:\ndata is not read from a function argument, so there is no argument position\nto point at. The field is still accepted, and ignored, so that policies\nwritten before it became optional keep working.",
                   "properties": {
                     "btfType": {
-                      "description": "Type to use as the initial resolve type. For kprobe args it looks up the named struct\nfrom the kernel BTF, casting the argument's type before traversing the resolve path.\nFor UprobeSpecs and UsdtSpecs it looks up the type from the BTF file defined by BTFPath.",
+                      "description": "Type to use as the initial resolve type. For kprobe data it looks up the named struct\nfrom the kernel BTF, casting the value's type before traversing the resolve path.\nFor UprobeSpecs and UsdtSpecs it looks up the type from the BTF file defined by BTFPath.",
                       "type": "string"
                     },
                     "btfTypeModule": {
-                      "description": "Kernel module that contains the BTFType. This is used only for kprobe args.\nThe module must already be loaded and expose BTF in /sys/kernel/btf.",
+                      "description": "Kernel module that contains the BTFType. This is used only for kprobe data.\nThe module must already be loaded and expose BTF in /sys/kernel/btf.",
                       "type": "string"
                     },
                     "index": {
-                      "description": "Position of the argument.",
+                      "description": "Unused for data and ignored. Accepted for backwards compatibility.",
                       "format": "int32",
                       "minimum": 0,
                       "type": "integer"
@@ -1744,11 +1745,11 @@
                     },
                     "returnCopy": {
                       "default": false,
-                      "description": "This field is used only for char_buf and char_iovec types. It indicates\nthat this argument should be read later (when the kretprobe for the\nsymbol is triggered) because it might not be populated when the kprobe\nis triggered at the entrance of the function. For example, a buffer\nsupplied to read(2) won't have content until kretprobe is triggered.",
+                      "description": "This field is used only for char_buf and char_iovec types. It indicates\nthat this data should be read later (when the kretprobe for the\nsymbol is triggered) because it might not be populated when the kprobe\nis triggered at the entrance of the function.",
                       "type": "boolean"
                     },
                     "sizeArgIndex": {
-                      "description": "Specifies the position of the corresponding size argument for this argument.\nThis field is used only for char_buf and char_iovec types.",
+                      "description": "Specifies the position of the corresponding size argument for this data.\nThis field is used only for char_buf and char_iovec types.",
                       "format": "int32",
                       "minimum": 0,
                       "type": "integer"
@@ -1759,7 +1760,7 @@
                     },
                     "type": {
                       "default": "auto",
-                      "description": "Argument type.",
+                      "description": "Data type.",
                       "enum": [
                         "auto",
                         "int",
@@ -1818,7 +1819,6 @@
                     }
                   },
                   "required": [
-                    "index",
                     "type"
                   ],
                   "type": "object",
@@ -6726,17 +6726,18 @@
               "data": {
                 "description": "A list of data to include in the trace output.",
                 "items": {
+                  "description": "KProbeData describes a piece of data to include in the trace output that is\nread from somewhere other than the traced function's arguments, as set by\nSource (for example the current task).\n\nIt carries the same fields as KProbeArg, except that Index is optional:\ndata is not read from a function argument, so there is no argument position\nto point at. The field is still accepted, and ignored, so that policies\nwritten before it became optional keep working.",
                   "properties": {
                     "btfType": {
-                      "description": "Type to use as the initial resolve type. For kprobe args it looks up the named struct\nfrom the kernel BTF, casting the argument's type before traversing the resolve path.\nFor UprobeSpecs and UsdtSpecs it looks up the type from the BTF file defined by BTFPath.",
+                      "description": "Type to use as the initial resolve type. For kprobe data it looks up the named struct\nfrom the kernel BTF, casting the value's type before traversing the resolve path.\nFor UprobeSpecs and UsdtSpecs it looks up the type from the BTF file defined by BTFPath.",
                       "type": "string"
                     },
                     "btfTypeModule": {
-                      "description": "Kernel module that contains the BTFType. This is used only for kprobe args.\nThe module must already be loaded and expose BTF in /sys/kernel/btf.",
+                      "description": "Kernel module that contains the BTFType. This is used only for kprobe data.\nThe module must already be loaded and expose BTF in /sys/kernel/btf.",
                       "type": "string"
                     },
                     "index": {
-                      "description": "Position of the argument.",
+                      "description": "Unused for data and ignored. Accepted for backwards compatibility.",
                       "format": "int32",
                       "minimum": 0,
                       "type": "integer"
@@ -6757,11 +6758,11 @@
                     },
                     "returnCopy": {
                       "default": false,
-                      "description": "This field is used only for char_buf and char_iovec types. It indicates\nthat this argument should be read later (when the kretprobe for the\nsymbol is triggered) because it might not be populated when the kprobe\nis triggered at the entrance of the function. For example, a buffer\nsupplied to read(2) won't have content until kretprobe is triggered.",
+                      "description": "This field is used only for char_buf and char_iovec types. It indicates\nthat this data should be read later (when the kretprobe for the\nsymbol is triggered) because it might not be populated when the kprobe\nis triggered at the entrance of the function.",
                       "type": "boolean"
                     },
                     "sizeArgIndex": {
-                      "description": "Specifies the position of the corresponding size argument for this argument.\nThis field is used only for char_buf and char_iovec types.",
+                      "description": "Specifies the position of the corresponding size argument for this data.\nThis field is used only for char_buf and char_iovec types.",
                       "format": "int32",
                       "minimum": 0,
                       "type": "integer"
@@ -6772,7 +6773,7 @@
                     },
                     "type": {
                       "default": "auto",
-                      "description": "Argument type.",
+                      "description": "Data type.",
                       "enum": [
                         "auto",
                         "int",
@@ -6831,7 +6832,6 @@
                     }
                   },
                   "required": [
-                    "index",
                     "type"
                   ],
                   "type": "object",
